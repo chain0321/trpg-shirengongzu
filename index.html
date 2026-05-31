@@ -115,6 +115,25 @@
       backdrop-filter: blur(8px);
     }
 
+    /* Mobile responsive */
+    @media (max-width: 640px) {
+      .top-bar { padding: 0.5rem 0.75rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .top-bar::-webkit-scrollbar { display: none; }
+      .step-pill { white-space: nowrap; font-size: 0.65rem; padding: 3px 8px; }
+
+      .character-card { aspect-ratio: 3 / 4.2; }
+      .card-back { padding: 0.75rem; }
+      .card-back .font-serif-cn { font-size: 1.1rem !important; }
+      .card-back p { font-size: 0.75rem !important; line-height: 1.5 !important; }
+      .card-back button { padding: 0.4rem 0.5rem !important; font-size: 0.75rem !important; }
+
+      .opt-card { padding: 0.5rem !important; }
+      .opt-card .font-bold { font-size: 0.85rem; }
+      .opt-card .text-xs { font-size: 0.65rem; }
+      .opt-card .font-serif-cn.text-3xl { font-size: 1.5rem !important; }
+      .opt-card .font-serif-cn.text-xl { font-size: 1rem !important; }
+    }
+
     @media print {
       body { background: #fff; }
       .no-print { display: none !important; }
@@ -125,11 +144,11 @@
 <div id="app">
 
   <!-- ========== ENTRY PAGE ========== -->
-  <div v-if="screen === 'entry'" class="min-h-screen flex flex-col items-center justify-center p-8">
+  <div v-if="screen === 'entry'" class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
     <div class="text-center">
       <div class="inline-block w-8 h-8 bg-[#C8362C] mb-6"></div>
-      <h1 class="font-serif-cn text-5xl md:text-6xl font-bold mb-4 tracking-wide">十人小组世界规则</h1>
-      <p class="text-gray-500 mb-16 text-lg">一起搭建虚构世界</p>
+      <h1 class="font-serif-cn text-3xl sm:text-5xl md:text-6xl font-bold mb-4 tracking-wide">十人小组世界规则</h1>
+      <p class="text-gray-500 mb-10 sm:mb-16 text-base sm:text-lg">一起搭建虚构世界</p>
       <div class="flex flex-col gap-3 w-full max-w-xs mx-auto">
         <button @click="startGame" class="btn-primary">开始探索</button>
       </div>
@@ -141,23 +160,23 @@
   <div v-else-if="screen === 'flow'" class="min-h-screen">
 
     <!-- top bar -->
-    <div class="top-bar px-6 py-3 flex justify-between items-center text-sm sticky top-0 z-10">
-      <div class="flex gap-2 flex-wrap items-center">
+    <div class="top-bar px-3 sm:px-6 py-2 sm:py-3 flex justify-between items-center text-sm sticky top-0 z-10">
+      <div class="flex gap-1 sm:gap-2 flex-nowrap items-center overflow-x-auto">
         <span :class="['step-pill', step === 0 ? 'active' : step > 0 ? 'done' : '']">简介</span>
-        <span :class="['step-pill', step === 1 ? 'active' : step > 1 ? 'done' : '']">本期背景</span>
-        <span :class="['step-pill', step === 2 ? 'active' : step > 2 ? 'done' : '']">世界配置</span>
+        <span :class="['step-pill', step === 1 ? 'active' : step > 1 ? 'done' : '']">背景</span>
+        <span :class="['step-pill', step === 2 ? 'active' : step > 2 ? 'done' : '']">配置</span>
         <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']">选角色</span>
-        <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']">角色测试</span>
-        <span :class="['step-pill', step === 5 ? 'active' : '']">我的报告</span>
+        <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']">测试</span>
+        <span :class="['step-pill', step === 5 ? 'active' : '']">报告</span>
       </div>
-      <div class="text-gray-500 text-xs">
+      <div class="text-gray-500 text-xs hidden sm:block flex-shrink-0 ml-2">
         {{ selectedChars.length ? selectedChars.map(id => getChar(id).name).join(' + ') : '未选角色' }}
       </div>
     </div>
 
     <!-- ===== Step 0: intro ===== -->
-    <div v-if="step === 0" class="max-w-3xl mx-auto p-6 md:p-10">
-      <h2 class="font-serif-cn text-4xl mb-2 red-mark">游戏简介</h2>
+    <div v-if="step === 0" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">游戏简介</h2>
       <p class="text-gray-500 mb-10 ml-6">Step 0 / 5</p>
       <div class="space-y-4 text-gray-800 leading-relaxed">
         <p>《十人小组》是一款一起搭建想象世界的游戏。最终成果是"<b>一个由所有玩家共同塑造的、逻辑自洽的虚构世界</b>"。</p>
@@ -165,11 +184,11 @@
         <p>过程中可能穿插角色扮演、圆桌辩论、推理解密····欢迎多元的表达方式。</p>
         <h3 class="font-serif-cn text-xl mt-10 mb-4 red-mark">与以下游戏相关却不同</h3>
         <ul class="space-y-2">
-          <li class="card p-4"><span class="chip chip-red mr-3">vs 剧本杀</span>无剧本，只有发言流程</li>
-          <li class="card p-4"><span class="chip chip-red mr-3">vs 跑团 TRPG</span>故事是世界搭建的副产品，DM 并不了解世界</li>
-          <li class="card p-4"><span class="chip chip-red mr-3">vs 辩论</span>目的是维持世界观自洽，不是为了说服、击败对方</li>
-          <li class="card p-4"><span class="chip chip-red mr-3">vs 桌游</span>胜利不是竞技输赢，而是"让游戏继续下去"</li>
-          <li class="card p-4"><span class="chip chip-red mr-3">vs 狼人杀</span>没有天然阵营，一切都在世界观搭建中自然形成</li>
+          <li class="card p-3 sm:p-4 text-sm sm:text-base"><span class="chip chip-red mr-2 sm:mr-3">vs 剧本杀</span>无剧本，只有发言流程</li>
+          <li class="card p-3 sm:p-4 text-sm sm:text-base"><span class="chip chip-red mr-2 sm:mr-3">vs 跑团 TRPG</span>故事是世界搭建的副产品，DM 并不了解世界</li>
+          <li class="card p-3 sm:p-4 text-sm sm:text-base"><span class="chip chip-red mr-2 sm:mr-3">vs 辩论</span>目的是维持世界观自洽，不是为了说服、击败对方</li>
+          <li class="card p-3 sm:p-4 text-sm sm:text-base"><span class="chip chip-red mr-2 sm:mr-3">vs 桌游</span>胜利不是竞技输赢，而是"让游戏继续下去"</li>
+          <li class="card p-3 sm:p-4 text-sm sm:text-base"><span class="chip chip-red mr-2 sm:mr-3">vs 狼人杀</span>没有天然阵营，一切都在世界观搭建中自然形成</li>
         </ul>
         <p class="text-gray-500 italic mt-6 text-sm">游戏无需提前了解规则或复杂准备，现场会发放规则书，根据流程逐一推进。</p>
       </div>
@@ -177,11 +196,11 @@
     </div>
 
     <!-- ===== Step 1: theme background ===== -->
-    <div v-else-if="step === 1" class="max-w-3xl mx-auto p-6 md:p-10">
-      <h2 class="font-serif-cn text-4xl mb-2 red-mark">本期背景</h2>
+    <div v-else-if="step === 1" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">本期背景</h2>
       <p class="text-gray-500 mb-10 ml-6">Step 1 / 5 · 主题：地下城</p>
-      <div class="card p-6 mb-10">
-        <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">101 号地下城漂浮在论坛 10.101.0.1 的深处。没人知道是谁建造了它，也没人能确认论坛背后是否真的有人在发帖。每隔一段时间，论坛会传来敲门声……</p>
+      <div class="card p-4 sm:p-6 mb-8 sm:mb-10">
+        <p class="text-gray-800 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">101 号地下城漂浮在论坛 10.101.0.1 的深处。没人知道是谁建造了它，也没人能确认论坛背后是否真的有人在发帖。每隔一段时间，论坛会传来敲门声……</p>
       </div>
       <h3 class="font-serif-cn text-xl mb-4 red-mark">你可能想到的问题</h3>
       <ul class="space-y-2 mb-10 ml-6">
@@ -211,14 +230,14 @@
     </div>
 
     <!-- ===== Step 2: S0 questionnaire ===== -->
-    <div v-else-if="step === 2" class="max-w-3xl mx-auto p-6 md:p-10">
-      <h2 class="font-serif-cn text-4xl mb-2 red-mark">S0 · 世界配置</h2>
+    <div v-else-if="step === 2" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">S0 · 世界配置</h2>
       <p class="text-gray-500 mb-10 ml-6">Step 2 / 5 · 所有事件、空间、人物都在该框架内生长。</p>
 
       <!-- Q1 -->
-      <div class="card p-6 mb-6">
-        <h3 class="font-serif-cn text-xl mb-2 red-mark">Q1 · 世界基底</h3>
-        <p class="text-gray-500 text-sm mb-5 ml-6">选 2 个：1 个"表世界"（故事舞台）+ 1 个"里世界"（隐藏暗流）</p>
+      <div class="card p-4 sm:p-6 mb-4 sm:mb-6">
+        <h3 class="font-serif-cn text-lg sm:text-xl mb-2 red-mark">Q1 · 世界基底</h3>
+        <p class="text-gray-500 text-xs sm:text-sm mb-4 sm:mb-5 ml-6">选 2 个：1 个"表世界"（故事舞台）+ 1 个"里世界"（隐藏暗流）</p>
 
         <h4 class="text-sm font-medium text-gray-600 mb-3">表世界</h4>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -245,8 +264,8 @@
       </div>
 
       <!-- Q2 -->
-      <div class="card p-6 mb-6">
-        <h3 class="font-serif-cn text-xl mb-5 red-mark">Q2 · 空间范围</h3>
+      <div class="card p-4 sm:p-6 mb-4 sm:mb-6">
+        <h3 class="font-serif-cn text-lg sm:text-xl mb-4 sm:mb-5 red-mark">Q2 · 空间范围</h3>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
           <div v-for="opt in s0Options.q2" :key="opt.id"
                :class="['opt-card p-4 text-center',
@@ -259,8 +278,8 @@
       </div>
 
       <!-- Q3 -->
-      <div class="card p-6 mb-6">
-        <h3 class="font-serif-cn text-xl mb-5 red-mark">Q3 · 时间范围</h3>
+      <div class="card p-4 sm:p-6 mb-4 sm:mb-6">
+        <h3 class="font-serif-cn text-lg sm:text-xl mb-4 sm:mb-5 red-mark">Q3 · 时间范围</h3>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div v-for="opt in s0Options.q3" :key="opt.id"
                :class="['opt-card p-4 text-center',
@@ -279,10 +298,10 @@
     </div>
 
     <!-- ===== Step 3: character selection with FLIP CARDS ===== -->
-    <div v-else-if="step === 3" class="max-w-6xl mx-auto p-6 md:p-10">
-      <h2 class="font-serif-cn text-4xl mb-2 red-mark">选择你的原型角色</h2>
-      <p class="text-gray-500 mb-10 ml-6">Step 3 / 5 · 选择 2 个角色 · 点击卡片翻转查看简介</p>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+    <div v-else-if="step === 3" class="max-w-6xl mx-auto px-3 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">选择你的原型角色</h2>
+      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">Step 3 / 5 · 选择 2 个角色 · 点击卡片翻转查看简介</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-8">
         <div v-for="c in characters" :key="c.id"
              @click="flipCard(c)"
              :class="['character-card',
@@ -292,8 +311,8 @@
             <!-- 正面：头像 + 名字 -->
             <div class="card-face card-front">
               <img :src="characterImages[c.id]" :alt="c.name" class="character-img">
-              <div class="p-3">
-                <div class="font-serif-cn text-lg font-bold">{{ c.name }}</div>
+              <div class="p-2 sm:p-3">
+                <div class="font-serif-cn text-sm sm:text-lg font-bold">{{ c.name }}</div>
                 <div class="text-xs text-[#C8362C] mt-1 font-medium" v-if="selectedChars.includes(c.id)">✓ 你的选择 #{{ selectedChars.indexOf(c.id) + 1 }}</div>
                 <div class="text-xs text-gray-400 mt-1" v-else>点击查看简介</div>
               </div>
@@ -315,17 +334,17 @@
           </div>
         </div>
       </div>
-      <div class="flex justify-between items-center sticky bottom-0 bg-[#FAFAF7] py-4 border-t border-[#E8E5DF]">
-        <p class="text-gray-700">当前选中（{{ selectedChars.length }}/2）：<b>{{ selectedChars.length ? selectedChars.map(id => getChar(id).name).join(' + ') : '— 未选择 —' }}</b></p>
-        <button @click="step = 4" :disabled="selectedChars.length !== 2" class="btn-primary">确认选择 →</button>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sticky bottom-0 bg-[#FAFAF7] py-3 sm:py-4 px-2 sm:px-0 border-t border-[#E8E5DF]">
+        <p class="text-gray-700 text-sm sm:text-base">选中（{{ selectedChars.length }}/2）：<b>{{ selectedChars.length ? selectedChars.map(id => getChar(id).name).join(' + ') : '— 未选择 —' }}</b></p>
+        <button @click="step = 4" :disabled="selectedChars.length !== 2" class="btn-primary w-full sm:w-auto">确认选择 →</button>
       </div>
     </div>
 
     <!-- ===== Step 4: character test iframe ===== -->
-    <div v-else-if="step === 4" class="max-w-5xl mx-auto p-6 md:p-10">
-      <h2 class="font-serif-cn text-4xl mb-2 red-mark">原型角色测试</h2>
-      <p class="text-gray-500 mb-10 ml-6">Step 4 / 5 · 测试仅为辅助，结果可参考，最终自由选择</p>
-      <div class="card overflow-hidden mb-4" style="height: 70vh; min-height: 500px;">
+    <div v-else-if="step === 4" class="max-w-5xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">原型角色测试</h2>
+      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">Step 4 / 5 · 测试仅为辅助，结果可参考，最终自由选择</p>
+      <div class="card overflow-hidden mb-4" style="height: 60vh; min-height: 400px;">
         <iframe src="https://ziitpmph.manus.space" class="w-full h-full" frameborder="0"></iframe>
       </div>
       <p class="text-gray-500 text-sm mb-6">如果上方测试无法显示，<a href="https://ziitpmph.manus.space" target="_blank" class="text-[#C8362C] underline">点这里在新标签页打开</a></p>
@@ -333,15 +352,15 @@
     </div>
 
     <!-- ===== Step 5: Personal Report ===== -->
-    <div v-else-if="step === 5" class="max-w-3xl mx-auto p-6 md:p-10">
-      <h2 class="font-serif-cn text-4xl mb-2 red-mark">我的世界报告</h2>
+    <div v-else-if="step === 5" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">我的世界报告</h2>
       <p class="text-gray-500 mb-10 ml-6">Step 5 / 5 · {{ selectedChars.map(id => getChar(id).name).join(' × ') }} 的视角</p>
 
       <!-- Character Info -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div v-for="(cid, idx) in selectedChars" :key="cid" class="card p-6">
-          <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
+        <div v-for="(cid, idx) in selectedChars" :key="cid" class="card p-4 sm:p-6">
+          <div class="flex items-center gap-3 sm:gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
               <img :src="characterImages[cid]" :alt="getChar(cid).name" class="w-full h-full object-cover">
             </div>
             <div>
@@ -354,9 +373,9 @@
       </div>
 
       <!-- S0 Summary -->
-      <div class="space-y-6">
-        <div class="card p-6">
-          <h3 class="font-serif-cn text-lg font-bold mb-4">世界基底</h3>
+      <div class="space-y-4 sm:space-y-6">
+        <div class="card p-4 sm:p-6">
+          <h3 class="font-serif-cn text-lg font-bold mb-3 sm:mb-4">世界基底</h3>
           <div class="flex items-center gap-3 flex-wrap">
             <span class="chip chip-red text-sm px-4 py-2">表层：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
             <span class="text-gray-400">×</span>
@@ -364,21 +383,21 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="card p-6">
-            <h3 class="font-serif-cn text-lg font-bold mb-3">空间范围</h3>
-            <div class="font-serif-cn text-4xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
+        <div class="grid grid-cols-2 gap-4 sm:gap-6">
+          <div class="card p-4 sm:p-6">
+            <h3 class="font-serif-cn text-base sm:text-lg font-bold mb-2 sm:mb-3">空间范围</h3>
+            <div class="font-serif-cn text-2xl sm:text-4xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
             <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q2', s0Answers.q2) }}</p>
           </div>
-          <div class="card p-6">
-            <h3 class="font-serif-cn text-lg font-bold mb-3">时间范围</h3>
-            <div class="font-serif-cn text-4xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
+          <div class="card p-4 sm:p-6">
+            <h3 class="font-serif-cn text-base sm:text-lg font-bold mb-2 sm:mb-3">时间范围</h3>
+            <div class="font-serif-cn text-2xl sm:text-4xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
             <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
           </div>
         </div>
 
         <!-- World Summary -->
-        <div style="background:#1a1a1a; color:white; border-radius:0.5rem; padding:2rem;">
+        <div class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8">
           <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">你的世界简述</h3>
           <p class="leading-relaxed opacity-90 text-sm">
             这是一个由<b>{{ selectedChars.map(id => getChar(id).name).join('</b> 和 <b>') }}</b>共同观察的世界。
