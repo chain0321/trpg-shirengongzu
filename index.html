@@ -73,7 +73,7 @@
     .character-card.selected .card-face { border: 2px solid #C8362C; }
     .character-card.taken { opacity: 0.45; cursor: pointer; }
     .character-card.taken .card-front::after {
-      content: '✕'; position: absolute; top: 8px; right: 8px;
+      content: '\2715'; position: absolute; top: 8px; right: 8px;
       width: 24px; height: 24px; border-radius: 50%;
       background: #C8362C; color: white;
       display: flex; align-items: center; justify-content: center;
@@ -104,8 +104,8 @@
     }
     .chip-red { background: #FCE8E5; color: #C8362C; }
 
-    .bar-track { background: #F0EDE4; }
-    .bar-fill { background: #1a1a1a; height: 100%; transition: width 400ms; }
+    .bar-track { background: #F0EDE4; height: 10px; border-radius: 5px; overflow: hidden; }
+    .bar-fill { background: #C8362C; height: 100%; border-radius: 5px; transition: width 800ms ease; }
 
     .grayscale-img { filter: grayscale(1); opacity: 0.3; }
 
@@ -114,6 +114,41 @@
       background: rgba(250, 250, 247, 0.95);
       backdrop-filter: blur(8px);
     }
+
+    /* Test option */
+    .test-option {
+      display: block; width: 100%; text-align: left;
+      background: white; border: 1px solid #E8E5DF; border-radius: 0.5rem;
+      padding: 14px 18px; font-size: 0.92rem; line-height: 1.6;
+      color: #1a1a1a; cursor: pointer; transition: all 200ms;
+      font-family: inherit;
+    }
+    .test-option:hover { border-color: #C8362C; background: #FDF6F5; }
+    .test-option.selected { border-color: #C8362C; background: #FDF6F5; box-shadow: 0 0 0 1px #C8362C; }
+
+    .q-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #ddd; transition: background 0.2s;
+    }
+    .q-dot.answered { background: #C8362C; }
+    .q-dot.current { background: #C8362C; box-shadow: 0 0 0 3px rgba(200,54,44,0.2); }
+
+    .scene-intro-card {
+      background: #FFFCF5; border: 1px solid #E8E5DF; border-radius: 0.5rem;
+      padding: 20px 24px; color: #555; font-size: 0.95rem; line-height: 1.8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.4s ease; }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .shadow-border { border-left: 3px solid #333; }
 
     /* Mobile responsive */
     @media (max-width: 640px) {
@@ -132,6 +167,8 @@
       .opt-card .text-xs { font-size: 0.65rem; }
       .opt-card .font-serif-cn.text-3xl { font-size: 1.5rem !important; }
       .opt-card .font-serif-cn.text-xl { font-size: 1rem !important; }
+
+      .test-option { padding: 12px 14px; font-size: 0.88rem; }
     }
 
     @media print {
@@ -152,7 +189,7 @@
       <div class="flex flex-col gap-3 w-full max-w-xs mx-auto">
         <button @click="startGame" class="btn-primary">开始探索</button>
       </div>
-      <p class="text-xs text-gray-400 mt-2">v3.0 · 单人静态版</p>
+      <p class="text-xs text-gray-400 mt-2">v4.0 · 含人格测试</p>
     </div>
   </div>
 
@@ -170,7 +207,7 @@
         <span :class="['step-pill', step === 5 ? 'active' : '']">报告</span>
       </div>
       <div class="text-gray-500 text-xs hidden sm:block flex-shrink-0 ml-2">
-        {{ selectedChars.length ? selectedChars.map(id => getChar(id).name).join(' + ') : '未选角色' }}
+        {{ selectedChar ? getChar(selectedChar).name : '未选角色' }}
       </div>
     </div>
 
@@ -297,27 +334,25 @@
       <p v-if="!s0Valid" class="text-gray-500 text-sm text-center mt-3">请完成所有题（表世界与里世界需不同）</p>
     </div>
 
-    <!-- ===== Step 3: character selection with FLIP CARDS ===== -->
+    <!-- ===== Step 3: character selection (1 character) ===== -->
     <div v-else-if="step === 3" class="max-w-6xl mx-auto px-3 py-6 sm:p-6 md:p-10">
       <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">选择你的原型角色</h2>
-      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">Step 3 / 5 · 选择 2 个角色 · 点击卡片翻转查看简介</p>
+      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">Step 3 / 5 · 选择 1 个你最想扮演的角色 · 点击卡片翻转查看简介</p>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-8">
         <div v-for="c in characters" :key="c.id"
              @click="flipCard(c)"
              :class="['character-card',
-                      selectedChars.includes(c.id) ? 'selected' : '',
+                      selectedChar === c.id ? 'selected' : '',
                       flippedCardId === c.id ? 'flipped' : '']">
           <div class="card-inner">
-            <!-- 正面：头像 + 名字 -->
             <div class="card-face card-front">
               <img :src="characterImages[c.id]" :alt="c.name" class="character-img">
               <div class="p-2 sm:p-3">
                 <div class="font-serif-cn text-sm sm:text-lg font-bold">{{ c.name }}</div>
-                <div class="text-xs text-[#C8362C] mt-1 font-medium" v-if="selectedChars.includes(c.id)">✓ 你的选择 #{{ selectedChars.indexOf(c.id) + 1 }}</div>
+                <div class="text-xs text-[#C8362C] mt-1 font-medium" v-if="selectedChar === c.id">&#10003; 你的选择</div>
                 <div class="text-xs text-gray-400 mt-1" v-else>点击查看简介</div>
               </div>
             </div>
-            <!-- 背面：简介 + 选择按钮 -->
             <div class="card-face card-back">
               <div>
                 <div class="font-serif-cn text-2xl font-bold mb-3 red-mark">{{ c.name }}</div>
@@ -325,9 +360,8 @@
               </div>
               <div class="mt-3">
                 <button @click.stop="confirmCharacter(c)"
-                        :class="selectedChars.includes(c.id) ? 'btn-outline w-full text-sm py-2' : 'btn-primary w-full text-sm py-2'"
-                        :disabled="!selectedChars.includes(c.id) && selectedChars.length >= 2">
-                  {{ selectedChars.includes(c.id) ? '取消选择' : '选择此角色' }}
+                        :class="selectedChar === c.id ? 'btn-outline w-full text-sm py-2' : 'btn-primary w-full text-sm py-2'">
+                  {{ selectedChar === c.id ? '取消选择' : '选择此角色' }}
                 </button>
               </div>
             </div>
@@ -335,50 +369,86 @@
         </div>
       </div>
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sticky bottom-0 bg-[#FAFAF7] py-3 sm:py-4 px-2 sm:px-0 border-t border-[#E8E5DF]">
-        <p class="text-gray-700 text-sm sm:text-base">选中（{{ selectedChars.length }}/2）：<b>{{ selectedChars.length ? selectedChars.map(id => getChar(id).name).join(' + ') : '— 未选择 —' }}</b></p>
-        <button @click="step = 4" :disabled="selectedChars.length !== 2" class="btn-primary w-full sm:w-auto">确认选择 →</button>
+        <p class="text-gray-700 text-sm sm:text-base">选中：<b>{{ selectedChar ? getChar(selectedChar).name : '— 未选择 —' }}</b></p>
+        <button @click="startTest" :disabled="!selectedChar" class="btn-primary w-full sm:w-auto">确认，进入人格测试 →</button>
       </div>
     </div>
 
-    <!-- ===== Step 4: character test iframe ===== -->
-    <div v-else-if="step === 4" class="max-w-5xl mx-auto px-4 py-6 sm:p-6 md:p-10">
-      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">原型角色测试</h2>
-      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">Step 4 / 5 · 测试仅为辅助，结果可参考，最终自由选择</p>
-      <div class="card overflow-hidden mb-4" style="height: 60vh; min-height: 400px;">
-        <iframe src="https://ziitpmph.manus.space" class="w-full h-full" frameborder="0"></iframe>
+    <!-- ===== Step 4: Personality Test (embedded) ===== -->
+    <div v-else-if="step === 4">
+
+      <!-- Scene transition screen -->
+      <div v-if="testPhase === 'transition'" class="min-h-[80vh] flex flex-col items-center justify-center text-center p-6 sm:p-10 fade-in">
+        <h2 class="font-serif-cn text-2xl sm:text-3xl font-bold mb-4">{{ testScenes[testScene].transTitle }}</h2>
+        <p class="text-gray-600 max-w-lg leading-relaxed mb-10 text-sm sm:text-base">{{ testScenes[testScene].transDesc }}</p>
+        <button @click="enterNextScene" class="btn-primary">继续 →</button>
       </div>
-      <p class="text-gray-500 text-sm mb-6">如果上方测试无法显示，<a href="https://ziitpmph.manus.space" target="_blank" class="text-[#C8362C] underline">点这里在新标签页打开</a></p>
-      <button @click="step = 5" class="btn-primary">我做完了，查看报告 →</button>
+
+      <!-- Loading screen -->
+      <div v-else-if="testPhase === 'loading'" class="min-h-screen flex flex-col items-center justify-center text-center">
+        <div class="w-7 h-7 bg-[#C8362C] mb-8" style="animation: spin 1.2s ease-in-out infinite;"></div>
+        <h2 class="font-serif-cn text-xl font-bold mb-2">正在解析你的人格图谱…</h2>
+        <p class="text-gray-500 text-sm">十个声音正在集合</p>
+      </div>
+
+      <!-- Questions -->
+      <div v-else class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-serif-cn text-xl sm:text-2xl red-mark">{{ testScenes[testScene].title }}</h2>
+          <span class="text-gray-400 text-sm">{{ testGlobalIdx + 1 }} / 24</span>
+        </div>
+        <p class="text-gray-500 text-sm mb-6 ml-6">{{ testScenes[testScene].step }}</p>
+
+        <div class="scene-intro-card mb-8" v-if="testQ === 0">
+          {{ testScenes[testScene].intro }}
+        </div>
+
+        <div class="fade-in" :key="testGlobalIdx">
+          <div class="text-gray-500 text-xs mb-2">Q{{ testGlobalIdx + 1 }}</div>
+          <div class="font-medium text-base sm:text-lg mb-5 leading-relaxed">{{ currentQuestion.text }}</div>
+          <div class="flex flex-col gap-3">
+            <button v-for="(opt, oi) in currentQuestion.options" :key="oi"
+                    :class="['test-option', testAnswers[testGlobalIdx] === oi ? 'selected' : '']"
+                    @click="selectTestOption(oi)">
+              {{ opt.text }}
+            </button>
+          </div>
+          <div class="flex gap-1.5 mt-6">
+            <span v-for="i in 6" :key="i"
+                  :class="['q-dot',
+                           testAnswers[testScene * 6 + (i-1)] !== null ? 'answered' : '',
+                           (i-1) === testQ ? 'current' : '']"></span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- ===== Step 5: Personal Report ===== -->
+    <!-- ===== Step 5: Combined Report ===== -->
     <div v-else-if="step === 5" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
-      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">我的世界报告</h2>
-      <p class="text-gray-500 mb-10 ml-6">Step 5 / 5 · {{ selectedChars.map(id => getChar(id).name).join(' × ') }} 的视角</p>
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">你的世界档案</h2>
+      <p class="text-gray-500 mb-10 ml-6">Step 5 / 5 · {{ selectedChar ? getChar(selectedChar).name : '' }} 的视角</p>
 
       <!-- Character Info -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
-        <div v-for="(cid, idx) in selectedChars" :key="cid" class="card p-4 sm:p-6">
-          <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
-              <img :src="characterImages[cid]" :alt="getChar(cid).name" class="w-full h-full object-cover">
-            </div>
-            <div>
-              <div class="font-serif-cn text-xl font-bold red-mark">{{ getChar(cid).name }}</div>
-              <p class="text-gray-500 text-xs mt-1">角色 #{{ idx + 1 }}</p>
-            </div>
+      <div v-if="selectedChar" class="card p-4 sm:p-6 mb-6">
+        <div class="flex items-center gap-3 sm:gap-4">
+          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
+            <img :src="characterImages[selectedChar]" :alt="getChar(selectedChar).name" class="w-full h-full object-cover">
           </div>
-          <p class="text-gray-600 mt-3 text-sm leading-relaxed">{{ getChar(cid).desc }}</p>
+          <div>
+            <div class="font-serif-cn text-xl font-bold red-mark">{{ getChar(selectedChar).name }}</div>
+            <p class="text-gray-500 text-xs mt-1">你选择的角色</p>
+          </div>
         </div>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">{{ getChar(selectedChar).desc }}</p>
       </div>
 
       <!-- S0 Summary -->
-      <div class="space-y-4 sm:space-y-6">
+      <div class="space-y-4 sm:space-y-6 mb-8">
         <div class="card p-4 sm:p-6">
           <h3 class="font-serif-cn text-lg font-bold mb-3 sm:mb-4">世界基底</h3>
           <div class="flex items-center gap-3 flex-wrap">
             <span class="chip chip-red text-sm px-4 py-2">表层：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
-            <span class="text-gray-400">×</span>
+            <span class="text-gray-400">&times;</span>
             <span class="chip-red chip text-sm px-4 py-2" style="background:#FCE8E5;color:#C8362C;">里层：{{ getOptName('q1', s0Answers.q1_inner) }}</span>
           </div>
         </div>
@@ -395,19 +465,87 @@
             <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
           </div>
         </div>
+      </div>
+
+      <!-- Personality Test Results -->
+      <template v-if="testCompleted">
+        <!-- Radar Chart -->
+        <div class="card p-4 sm:p-6 mb-6">
+          <h3 class="font-serif-cn text-lg font-bold mb-4">你的十人小组</h3>
+          <div class="flex justify-center">
+            <canvas ref="radarCanvas" width="380" height="380" style="max-width:380px;width:100%;"></canvas>
+          </div>
+        </div>
+
+        <!-- Main Persona -->
+        <div class="card p-4 sm:p-6 mb-4">
+          <h3 class="font-serif-cn text-lg font-bold mb-3">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#C8362C] mr-2"></span>
+            主导人格：<span class="text-[#C8362C]">{{ sortedPersonas[0].name }}</span>
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">{{ personaDescriptions[sortedPersonas[0].key].main }}</p>
+        </div>
+
+        <!-- Shadow Persona -->
+        <div class="card p-4 sm:p-6 mb-4 shadow-border">
+          <h3 class="font-serif-cn text-lg font-bold mb-3">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-800 mr-2"></span>
+            影子人格：{{ sortedPersonas[sortedPersonas.length - 1].name }}
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">{{ personaDescriptions[sortedPersonas[sortedPersonas.length - 1].key].shadow }}</p>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="card p-4 sm:p-6 mb-4">
+          <h3 class="font-serif-cn text-lg font-bold mb-4">人格力量排序</h3>
+          <div class="space-y-3">
+            <div v-for="p in sortedPersonas" :key="p.key" class="flex items-center gap-3">
+              <span class="w-12 text-right text-sm font-medium flex-shrink-0">{{ p.name }}</span>
+              <div class="flex-1 bar-track">
+                <div class="bar-fill" :style="{ width: Math.round((p.score / (sortedPersonas[0].score || 1)) * 100) + '%' }"></div>
+              </div>
+              <span class="w-10 text-xs text-gray-500 flex-shrink-0">{{ Math.round((p.score / (sortedPersonas[0].score || 1)) * 100) }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Type -->
+        <div class="card p-4 sm:p-6 mb-4">
+          <h3 class="font-serif-cn text-lg font-bold mb-3">
+            <span class="inline-block px-3 py-0.5 rounded bg-[#C8362C] text-white text-xs mr-2">{{ matchedRoleType.name }}</span>
+            你在十人小组中的位置
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed">{{ matchedRoleType.desc }}</p>
+        </div>
+
+        <!-- Match Analysis -->
+        <div v-if="charPersonaKey" class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8 mb-6">
+          <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">角色匹配分析</h3>
+          <p class="leading-relaxed opacity-90 text-sm" v-if="isCharMatchTop">
+            你选择了<b>{{ getChar(selectedChar).name }}</b>，而测试也显示你的主导人格正是<b>{{ matchedPersonaName }}</b>。
+            <br>你对自己的了解很清醒——你选择了最熟悉的力量。在游戏中，这会让你如鱼得水。
+          </p>
+          <p class="leading-relaxed opacity-90 text-sm" v-else>
+            你选择了<b>{{ getChar(selectedChar).name }}</b>，但测试显示你的主导人格是<b>{{ sortedPersonas[0].name }}</b>。
+            <br>这意味着你渴望成为的人，和你本能的反应之间存在张力。
+            这种反差恰恰是游戏最有趣的部分——你会在扮演中发现自己从未展现过的那一面。
+          </p>
+        </div>
 
         <!-- World Summary -->
         <div class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8">
           <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">你的世界简述</h3>
           <p class="leading-relaxed opacity-90 text-sm">
-            这是一个由<b>{{ selectedChars.map(id => getChar(id).name).join('</b> 和 <b>') }}</b>共同观察的世界。
+            这是一个由<b>{{ selectedChar ? getChar(selectedChar).name : '' }}</b>观察的世界。
             它以<b>{{ getOptName('q1', s0Answers.q1_surface) }}</b>为表层结构，
             以<b>{{ getOptName('q1', s0Answers.q1_inner) }}</b>为深层逻辑。
             故事发生在一个<b>{{ getOptName('q2', s0Answers.q2) }}</b>级别的空间里，
             跨越<b>{{ getOptName('q3', s0Answers.q3) }}</b>的时间维度。
+            你的主导力量是<b>{{ sortedPersonas[0].name }}</b>的力量，
+            而<b>{{ sortedPersonas[sortedPersonas.length - 1].name }}</b>是你尚未觉醒的影子。
           </p>
         </div>
-      </div>
+      </template>
 
       <div class="mt-10 space-y-4 no-print">
         <button @click="resetGame" class="btn-outline w-full">重新开始</button>
@@ -421,20 +559,287 @@
 <script>
 const { createApp } = Vue;
 
+const PERSONAS = [
+  { key:'judge',  name:'法官',   color:'#C0392B' },
+  { key:'prof',   name:'教授',   color:'#2980B9' },
+  { key:'tyrant', name:'暴君',   color:'#2C3E50' },
+  { key:'joker',  name:'小丑',   color:'#E67E22' },
+  { key:'shaman', name:'灵婆',   color:'#8E44AD' },
+  { key:'x',      name:'X',      color:'#16A085' },
+  { key:'rebel',  name:'叛君',   color:'#C0392B' },
+  { key:'youth',  name:'少年',   color:'#2ECC71' },
+  { key:'ferry',  name:'摆渡人', color:'#3498DB' },
+  { key:'scribe', name:'史官',   color:'#F39C12' },
+];
+
+const CHAR_TO_PERSONA = {
+  faguan:   'judge',
+  jiaoshou: 'prof',
+  baojun:   'tyrant',
+  xiaochou: 'joker',
+  lingpo:   'shaman',
+  x:        'x',
+  panjun:   'rebel',
+  yongheng: 'youth',
+  baidu:    'ferry',
+  shiguan:  'scribe',
+  waiA:     null,
+  waiB:     null,
+};
+
+const TEST_SCENES = [
+  {
+    title: '灰烬之晨', step: '场景一 · 危机降临',
+    intro: '想象你身处一个正在崩塌的世界——通讯中断，天空被灰烬覆盖。你和几个幸存者站在一栋半塌的建筑前。一切秩序都消失了，而你必须在混乱中做出选择。',
+    transTitle: '场景二：十人之岛',
+    transDesc: '灾难过后，你和另外 9 个幸存者漂流到一座无人岛。没有现代工具，没有外界通讯。你们需要从零开始，建立一个新的小社会。',
+  },
+  {
+    title: '十人之岛', step: '场景二 · 建立秩序',
+    intro: '你和另外 9 个幸存者漂流到一座无人岛。没有现代工具。你们需要从零建立一个小社会——有水源、野果和木材，但其余一切都要自己创造。',
+    transTitle: '场景三：裂缝之下',
+    transDesc: '你们的小社会已经运转了一段时间。生存不再是问题了，但更深的问题浮出来——关于信任、真相、权力和牺牲。',
+  },
+  {
+    title: '裂缝之下', step: '场景三 · 道德与人性',
+    intro: '你们的小社会已经运转了一段时间。生存不再是最紧迫的问题了。但更深层的东西浮出了水面——关于信任、牺牲、真相和权力的拷问。',
+    transTitle: '场景四：新世界之门',
+    transDesc: '你面前出现了一扇门。门后是一个尚未成形的新世界——你的选择会塑造它的样子。在踏入之前，你需要做出最后几个选择。',
+  },
+  {
+    title: '新世界之门', step: '场景四 · 创造与选择',
+    intro: '你面前出现了一扇门。门后是一个尚未成形的新世界，你可以影响它的形态。在踏入之前，你需要做出一些选择——你的选择会塑造这个世界的样子。',
+  },
+];
+
+const TEST_QUESTIONS = [
+  // Scene 1
+  { scene:0, text:'灾难发生的第一刻，你脑海中浮现的念头最接近哪个？', options:[
+    { text:'"一定有原因。是天灾、人祸、还是某种规律？"', scores:{prof:2, scribe:1} },
+    { text:'"谁来负责？我们现在需要一个行动方案。"', scores:{tyrant:2, judge:1} },
+    { text:'"这让我想起某个故事……或者某种预兆。"', scores:{shaman:2, ferry:1} },
+    { text:'"旧世界完了。也许这正是某种开始。"', scores:{youth:2, joker:1} },
+  ]},
+  { scene:0, text:'一个受伤的陌生人出现了，请求加入你们。但他闪烁其词，明显在隐瞒什么。你会怎么做？', options:[
+    { text:'给他定个条件："可以留下，但有三条规矩必须遵守。"', scores:{judge:2, tyrant:1} },
+    { text:'单独跟他谈，通过问话判断他到底藏了什么、为什么藏。', scores:{rebel:2, prof:1} },
+    { text:'先收留他，观察他和其他人的互动，真相总会浮出来的。', scores:{scribe:2, shaman:1} },
+    { text:'不管他藏了什么，受伤的人需要帮助，这就够了。', scores:{ferry:2, youth:1} },
+  ]},
+  { scene:0, text:'你们找到一个物资点，但只够 8 个人用，而你们有 12 人。怎么办？', options:[
+    { text:'定一个标准——按需求、身体状况或贡献来分，规矩说了算。', scores:{judge:2, prof:1} },
+    { text:'我来决定。别讨论了，有些事需要有人扛下来。', scores:{tyrant:2, rebel:1} },
+    { text:'一定有别的办法，再去找新的物资点，或者想办法扩容。', scores:{youth:2, prof:1} },
+    { text:'先把最紧缺的分给最需要的人，其余的大家将就。', scores:{ferry:2, shaman:1} },
+    { text:'抽签。命运做选择比人做选择更公平。', scores:{x:2, joker:1} },
+  ]},
+  { scene:0, text:'夜晚围着火堆，有人问："你觉得这一切为什么会发生？"你最可能怎么回应？', options:[
+    { text:'"如果把之前的事件串起来看，其实是有迹可循的……"', scores:{scribe:2, prof:1} },
+    { text:'"也许不该问为什么，该问的是：这在告诉我们什么。"', scores:{shaman:2, ferry:1} },
+    { text:'"因为有些烂掉的东西，早就该被推翻了。"', scores:{youth:2, rebel:1} },
+    { text:'"谁知道呢。也许就是随机事件，没有意义。"', scores:{x:2, joker:1} },
+    { text:'"原因不重要了，重要的是我们接下来怎么组织。"', scores:{tyrant:2, judge:1} },
+  ]},
+  { scene:0, text:'废墟中你发现了一面刻满符号的墙。其他人没在意，但你停了下来。你的注意力被什么吸引？', options:[
+    { text:'符号的排列有某种规律，我想破译它的逻辑。', scores:{prof:2, judge:1} },
+    { text:'这些符号让我脑海里浮现了一个画面、一种氛围。', scores:{shaman:2, x:1} },
+    { text:'这是谁留下的？为什么刻在这里？背后一定有一段故事。', scores:{scribe:2, rebel:1} },
+    { text:'我用手触摸它，感觉像是某种告别、或者某种祝福。', scores:{ferry:2, shaman:1} },
+  ]},
+  { scene:0, text:'一个同伴宣布他要独自离开去找家人。外面很危险。你会说什么？', options:[
+    { text:'"你走了对团队有影响，我们需要重新评估分工。"', scores:{tyrant:1, prof:1, judge:1} },
+    { text:'"我不拦你。但你走之前，让我帮你记住这段路上发生的事。"', scores:{scribe:2, ferry:1} },
+    { text:'"你真正想找的，是家人，还是一个你不敢面对的答案？"', scores:{rebel:2, shaman:1} },
+    { text:'"我陪你。有些事比安全更重要。"', scores:{youth:2, ferry:1} },
+  ]},
+  // Scene 2
+  { scene:1, text:'登岛第一天，大家乱作一团。你自然地在做什么？', options:[
+    { text:'拿树枝在沙地上画地图，标注水源、高地、可能的危险区域。', scores:{prof:2, scribe:1} },
+    { text:'开始分工安排——你去找水，你去探路，你留下搭棚子。', scores:{tyrant:2, judge:1} },
+    { text:'走到每个人旁边，聊两句，看看谁在慌、谁在装、谁在观察。', scores:{rebel:2, shaman:1} },
+    { text:'找个高处坐下来，安静看着这一切，想着这像某个故事的开头。', scores:{scribe:1, shaman:1, ferry:1} },
+  ]},
+  { scene:1, text:'有人说"我们得有规矩"。你的反应是：', options:[
+    { text:'完全同意。我来起草，大家投票通过。', scores:{judge:3} },
+    { text:'可以，但别太多。两三条核心的就够，剩下的随机应变。', scores:{tyrant:1, prof:1, x:1} },
+    { text:'规矩是死的，人是活的。不如先一起生活，有问题了再说。', scores:{joker:1, x:1, shaman:1} },
+    { text:'比起规矩，我更想知道：大家各自相信什么。那比规矩更根本。', scores:{youth:2, rebel:1} },
+  ]},
+  { scene:1, text:'两个人因为食物分配大吵起来，快要动手了。你怎么介入？', options:[
+    { text:'站到中间，引用之前定的规矩来裁决。', scores:{judge:2, tyrant:1} },
+    { text:'让他们吵。冲突暴露的是真正的问题，压下去反而更危险。', scores:{rebel:2, joker:1} },
+    { text:'分别把两个人拉到一边，听各自说。他们需要的可能不是裁决，而是被听到。', scores:{ferry:2, shaman:1} },
+    { text:'提出一个新方案，换个分配逻辑，用方法绕过情绪。', scores:{prof:2, tyrant:1} },
+  ]},
+  { scene:1, text:'有个人每天什么都不做，只坐在海边发呆。大家越来越不满。你怎么看？', options:[
+    { text:'规矩面前人人平等。不能因为同情就例外。', scores:{judge:2, tyrant:1} },
+    { text:'他在经历什么？也许他需要的是一个转折点，而不是一份工作清单。', scores:{ferry:2, shaman:1} },
+    { text:'也许他看到了我们没注意到的东西。什么都不做，本身就是一种信号。', scores:{x:2, rebel:1} },
+    { text:'我想去坐在他旁边，不说话。也许他会自己开口。', scores:{shaman:2, youth:1} },
+  ]},
+  { scene:1, text:'你发现有人偷偷藏了食物。你怎么做？', options:[
+    { text:'公开这件事，大家一起讨论怎么处理。规矩就是规矩。', scores:{judge:2, youth:1} },
+    { text:'私下找他，问清楚原因。也许他有不得已的理由。', scores:{ferry:1, shaman:1, rebel:1} },
+    { text:'先不说，暗中记下来。这条线索以后可能很重要。', scores:{scribe:2, rebel:1} },
+    { text:'直接拿回来分掉，不废话。', scores:{tyrant:2, youth:1} },
+  ]},
+  { scene:1, text:'有人提议搞一个仪式来纪念"新生活的开始"。让你来设计，你会怎么做？', options:[
+    { text:'每个人讲述一件旧世界里最后记住的事，我来把它们串成一个完整的故事。', scores:{scribe:2, shaman:1} },
+    { text:'每个人丢掉一样东西到火堆里——代表和过去告别。', scores:{youth:2, ferry:1} },
+    { text:'设计一套流程：有誓言环节、有沉默环节、有火焰或水的象征物。', scores:{ferry:2, judge:1} },
+    { text:'搞点大家没想到的——比如让每个人匿名写下一个秘密，随机读出来。', scores:{joker:2, x:1} },
+  ]},
+  // Scene 3
+  { scene:2, text:'岛的另一边有更大的幸存者群体。物资比你们多，但规矩严厉，且要求合并后必须服从他们的领导。', options:[
+    { text:'谈判可以，但我们的核心公约不能改，底线就是底线。', scores:{judge:2, youth:1} },
+    { text:'合并对生存有利。可以暂时接受，等站稳了再改变。', scores:{tyrant:2, prof:1} },
+    { text:'先派人去观察他们内部真实的样子——人说的和做的往往不一样。', scores:{rebel:2, scribe:1} },
+    { text:'不去。我们自己建的东西，哪怕小，也是我们的。', scores:{youth:2, shaman:1} },
+  ]},
+  { scene:2, text:'为了稳定人心，有人编了一个善意的谎言。你发现了真相。', options:[
+    { text:'人们有权知道真相，哪怕痛苦，也好过活在幻觉里。', scores:{youth:2, judge:1} },
+    { text:'理解他为什么撒谎。但真相早晚会来，得找一个方式让大家慢慢接受。', scores:{prof:2, ferry:1} },
+    { text:'有意思——这个谎言本身就暴露了他最害怕什么。', scores:{rebel:2, joker:1} },
+    { text:'也许这个谎言虽然不是事实，但它可以变成一种信念、一个方向。', scores:{shaman:2, scribe:1} },
+  ]},
+  { scene:2, text:'需要有人穿过危险地带去取药品。成功了大家受益，失败了那个人可能回不来。', options:[
+    { text:'我去。有些事总需要有人站出来。', scores:{youth:2, tyrant:1} },
+    { text:'分析一下谁的条件最合适——不该靠勇气决定，该靠判断。', scores:{prof:2, tyrant:1} },
+    { text:'先想想有没有别的路。牺牲不该是第一选项。', scores:{shaman:1, prof:1, ferry:1} },
+    { text:'抽签。让命运来承担这个选择的重量。', scores:{x:2, judge:1} },
+  ]},
+  { scene:2, text:'因为你的贡献，大家推你做决策人。有了"权力"后，你内心最真实的反应是？', options:[
+    { text:'先定规矩限制自己的权力，权力没有制度约束就一定会出问题。', scores:{judge:2, prof:1} },
+    { text:'终于可以快速推动一些事了，效率比民主重要。', scores:{tyrant:3} },
+    { text:'有点警惕——我更想观察"权力"会怎么改变我和其他人的关系。', scores:{rebel:2, scribe:1} },
+    { text:'不太舒服。我不想站在上面，我想和大家站在一起。', scores:{ferry:2, youth:1} },
+  ]},
+  { scene:2, text:'岛上有个"记忆角"，每个人留下一件代表旧世界的东西。你会留什么？', options:[
+    { text:'一本笔记本——上面记了我认为最值得保留的知识或记录。', scores:{prof:1, scribe:2} },
+    { text:'一件和某个人有关的东西——一封信、一张照片、一个信物。', scores:{shaman:2, ferry:1} },
+    { text:'一个有象征意义的物件——它代表一个未完成的承诺或信念。', scores:{youth:2, rebel:1} },
+    { text:'什么都不留。旧世界的东西该断就断。', scores:{joker:1, tyrant:1, x:1} },
+  ]},
+  { scene:2, text:'如果明天一切就结束了——被救或被毁灭——今晚你会做什么？', options:[
+    { text:'把这段时间发生的一切写下来。有人要记住它。', scores:{scribe:3} },
+    { text:'找每个人聊聊，说那些平时没说出口的话。', scores:{shaman:2, ferry:1} },
+    { text:'一个人坐着，想清楚这一切到底意味着什么。', scores:{youth:1, prof:1, ferry:1} },
+    { text:'搞一场疯狂的庆祝——管它呢，明天交给明天。', scores:{joker:2, x:1} },
+  ]},
+  // Scene 4
+  { scene:3, text:'你只能从旧世界带走一样"无形之物"到新世界。你选：', options:[
+    { text:'法则——没有秩序，任何文明都会崩塌。', scores:{judge:2, tyrant:1} },
+    { text:'知识——理解世界的能力是一切的根基。', scores:{prof:3} },
+    { text:'记忆——忘记过去的人注定重蹈覆辙。', scores:{scribe:2, shaman:1} },
+    { text:'痛觉——如果人感受不到痛苦，也就感受不到彼此。', scores:{ferry:2, shaman:1} },
+    { text:'愤怒——那是唯一能让人改变世界的燃料。', scores:{youth:2, rebel:1} },
+  ]},
+  { scene:3, text:'新世界要求你从旧世界永久丢弃一样东西。你最能接受丢掉的是：', options:[
+    { text:'等级——人不应该被分成三六九等。', scores:{youth:2, joker:1} },
+    { text:'谎言——新世界里不需要任何形式的欺骗。', scores:{judge:2, youth:1} },
+    { text:'边界——墙、国境线、"我们"和"他们"的划分。', scores:{shaman:2, ferry:1} },
+    { text:'确定性——也许一个充满意外的世界更有活力。', scores:{x:2, joker:1} },
+  ]},
+  { scene:3, text:'新世界需要一条建立法则。你会定：', options:[
+    { text:'"任何决策不得由一个人做出。"', scores:{judge:2, prof:1} },
+    { text:'"不允许禁止任何思想和表达。"', scores:{youth:2, rebel:1} },
+    { text:'"每个生命在离开时，必须被所有人送行。"', scores:{ferry:2, shaman:1} },
+    { text:'"每隔一段时间，打乱一切重新分配。"', scores:{joker:1, x:1, tyrant:1} },
+  ]},
+  { scene:3, text:'新世界成形了。你自然地在做什么？', options:[
+    { text:'和人们坐在一起，用文字把这个世界从诞生到现在的故事记录下来。', scores:{scribe:2, shaman:1} },
+    { text:'站在公告栏前，张贴和解释新世界的公约，回答人们的疑问。', scores:{judge:2, prof:1} },
+    { text:'在人群边缘观察每个人的表情，你感觉到有些人嘴上说的和心里想的不一样。', scores:{rebel:2, shaman:1} },
+    { text:'独自走向边界之外，想看看新世界尽头有什么。', scores:{x:1, youth:1, prof:1} },
+  ]},
+  { scene:3, text:'新世界有一个习俗：每个人戴一个面具，面具上写着你平时最不想暴露给别人的那一面。你的面具上写的最接近：', options:[
+    { text:'"我其实很害怕失去控制。"', scores:{judge:2, tyrant:1}, shadow:true },
+    { text:'"我其实比任何人都渴望被看见。"', scores:{rebel:1, youth:1, shaman:1}, shadow:true },
+    { text:'"我其实什么都不确定。"', scores:{prof:2, scribe:1}, shadow:true },
+    { text:'"我其实想离开所有人。"', scores:{ferry:1, x:1, joker:1}, shadow:true },
+  ]},
+  { scene:3, text:'闭上眼。新世界已经安定了。黄昏时分，你在哪里，在做什么？选最让你心动的画面：', options:[
+    { text:'广场中央，对着所有人宣读一段关于新世界的宣言。人群安静地听着。', scores:{tyrant:1, judge:1, youth:1} },
+    { text:'一间灯光温暖的房间里，把所有人的故事编织进同一本书。', scores:{scribe:2, shaman:1} },
+    { text:'河边，一个人坐着。远处有人在笑，有人在哭，你都听见了，但你没有过去。', scores:{ferry:2, shaman:1} },
+    { text:'不知道什么地方。你在走，不知道要去哪，但觉得这条路是对的。', scores:{x:1, youth:1, joker:1} },
+  ]},
+];
+
+const PERSONA_DESCRIPTIONS = {
+  judge: {
+    main: '你心里住着一个穿黑袍的人。在所有人慌张、争吵、逃跑的时候，他会站起来。他不是最勇敢的，但他是最先说"我们需要一个规矩"的人。他相信：只要有规则，混乱就不会赢。在游戏中，你是那个写公约、定准则、站出来审判的人。',
+    shadow: '你最不愿承认的那面，是一个想掀翻桌子的冲动。也许偶尔放它出来，会发现世界没那么需要秩序。'
+  },
+  prof: {
+    main: '你看世界的方式是分析。别人看到混乱，你看到变量；别人看到灾难，你看到因果链。在游戏中，你是那个出方案、定计划、在危机面前保持冷静的人。你的武器是逻辑，你的信仰是：只要理解了问题，就能解决问题。',
+    shadow: '你最害怕的是"不知道"。承认无知对你来说比承认失败更难。'
+  },
+  tyrant: {
+    main: '有人必须做那个坏人。你不是不知道自己会被骂，你只是觉得，如果没人拍板，大家只会在原地争论到死。在游戏中，你是那个定权力工具、解释并执行计划、甚至跳过议会强制推动的人。效率是你的信仰。',
+    shadow: '你最不愿承认的是，有时候你害怕放手——因为一旦不掌控，你不知道自己是谁。'
+  },
+  joker: {
+    main: '你觉得所有正经的东西都有点可笑。不是因为你不认真，恰恰因为你太清醒了——你看到了正经背后的荒诞。在游戏中，你是那个埋伏笔、叙述正负后果、用出人意料的方式搅动剧情的人。',
+    shadow: '在笑和闹的背后，也许有一个不敢安静下来的你。因为安静的时候，那些真正的问题就会浮上来。'
+  },
+  shaman: {
+    main: '你有一种别人没有的能力：看见画面。别人听到一个词想到定义，你听到同一个词，脑海里出现的是一个场景、一种光线、一段氛围。在游戏中，你是那个用三个意象词唤起一整个世界的人。你不分析，你感应；你不解释，你描绘。',
+    shadow: '有时你会迷失在自己看见的东西里，分不清是预言还是幻觉。联结万物的代价，是偶尔失去自己的边界。'
+  },
+  x: {
+    main: '你是那个"然后呢"的人。当一切都按计划进行的时候，你会本能地想：如果在这里加一个变量呢？在游戏中，你是那个埋谜团、抽随机事件、让所有人的计划突然脱轨的人。不是因为你想搞破坏——你只是相信，不确定性才是生命力。',
+    shadow: '你最害怕的，也许恰恰是"没有意外"——一个完全可预测的世界，对你来说比混乱更恐怖。'
+  },
+  rebel: {
+    main: '你能看到别人不想被看到的那一面。每个人都戴着面具，你是那个悄悄走到面具后面的人。在游戏中，你建立暗线关系，操控影子人格，用对话和质问让人直面自己。你的武器不是力量，是洞察。',
+    shadow: '但看穿别人的人，往往最不愿意被看穿。你的面具藏得最深，因为你最知道面具的力量。'
+  },
+  youth: {
+    main: '你相信有些东西值得用一切去换。别人叫它天真，你叫它信念。在游戏中，你是那个选择"丢弃之物"、定义禁忌与至尊的人。你的任务是做出那个所有人都不敢做的选择——决定什么该被保留，什么该被放弃。',
+    shadow: '你最不愿承认的是，有时候你的愤怒不是为了世界，是为了你自己。坚持信念和固执己见之间，界线很模糊。'
+  },
+  ferry: {
+    main: '你是那个在大家都在争论"怎么办"的时候，走到角落去陪哭泣的人的人。你不解决问题——你承接痛苦。在游戏中，你写命运判词、设计仪式、引渡死亡的玩家。你的力量不是改变命运，而是让人在命运面前不那么孤独。',
+    shadow: '你最不愿承认的是，有时候你想逃。你承接了太多人的重量，却很少有人问你：你还好吗？'
+  },
+  scribe: {
+    main: '你是那个在大家都在"活着"的时候，默默在"记着"的人。你能把七嘴八舌的片段，编织成一条有头有尾的线。在游戏中，你叙述末日、提炼大事件、整合所有人的创造。你的武器不是规则或力量，是叙事本身——谁掌握了故事，谁就掌握了意义。',
+    shadow: '但记录者的危险在于：你总是在旁观。你记住了所有人的故事，却忘了写自己的。'
+  },
+};
+
+const ROLE_TYPES = [
+  { name:'锚点型', combo:['judge','prof'], desc:'混乱中的定海神针。你习惯用规则和逻辑稳定局面，是团队在危机时最先想到的人。在游戏中，你适合承担制定规则、设计方案的任务。' },
+  { name:'引擎型', combo:['tyrant','youth'], desc:'让事情真正发生的推力。你不怕做决定，也不怕为信念付出代价。在游戏中，你是那个拍板、执行、捍卫立场的人。' },
+  { name:'雷达型', combo:['shaman','ferry'], desc:'最先感知到问题的天线。你能读懂氛围、感知情绪、看到别人看不到的联结。在游戏中，你适合描绘画面、设计仪式、引导他人穿越苦难。' },
+  { name:'火花型', combo:['joker','x'], desc:'打破僵局的不可控变量。当所有人陷入惯性时，你是那个扔出意外的人。在游戏中，你适合埋伏笔、制造反转、引入随机事件。' },
+  { name:'镜子型', combo:['rebel','scribe'], desc:'揭示被忽略真相的人。你一个看穿人心，一个编织叙事——合在一起，是最危险的组合。在游戏中，你适合洞察心理、记录历史、操控暗线。' },
+];
+
 createApp({
   data() {
     return {
       screen: 'entry',
       step: 0,
-      selectedChars: [],
+      selectedChar: null,
       flippedCardId: null,
       characterImages: window.CHARACTER_IMAGES || {},
-      s0Answers: {
-        q1_surface: null,
-        q1_inner: null,
-        q2: null,
-        q3: null
-      },
+      s0Answers: { q1_surface: null, q1_inner: null, q2: null, q3: null },
+
+      // Test state
+      testScene: 0,
+      testQ: 0,
+      testAnswers: new Array(24).fill(null),
+      testPhase: 'questions', // 'questions' | 'transition' | 'loading'
+      testCompleted: false,
+
+      // Static data refs
+      testScenes: TEST_SCENES,
+      testQuestions: TEST_QUESTIONS,
+      personaList: PERSONAS,
+      personaDescriptions: PERSONA_DESCRIPTIONS,
+
       characters: [
         { id: 'panjun',   name: '叛君',     desc: '推翻旧秩序的人，深知自己终将成为下一个被推翻者。' },
         { id: 'shiguan',  name: '史官',     desc: '不参与，只记录。在他眼里，正在发生的瞬间已经是过去。' },
@@ -478,45 +883,178 @@ createApp({
     s0Valid() {
       const s = this.s0Answers;
       return s.q1_surface && s.q1_inner && s.q1_surface !== s.q1_inner && s.q2 && s.q3;
-    }
+    },
+    testGlobalIdx() {
+      return this.testScene * 6 + this.testQ;
+    },
+    currentQuestion() {
+      return TEST_QUESTIONS[this.testGlobalIdx] || TEST_QUESTIONS[0];
+    },
+    sortedPersonas() {
+      const scores = {};
+      PERSONAS.forEach(p => scores[p.key] = 0);
+      TEST_QUESTIONS.forEach((q, qi) => {
+        const ai = this.testAnswers[qi];
+        if (ai === null) return;
+        const opt = q.options[ai];
+        Object.entries(opt.scores).forEach(([k, v]) => { scores[k] += v; });
+      });
+      return PERSONAS.map(p => ({ ...p, score: scores[p.key] }))
+        .sort((a, b) => b.score - a.score);
+    },
+    matchedRoleType() {
+      const top2 = new Set([this.sortedPersonas[0].key, this.sortedPersonas[1].key]);
+      for (const rt of ROLE_TYPES) {
+        if (rt.combo.filter(k => top2.has(k)).length === 2) return rt;
+      }
+      for (const rt of ROLE_TYPES) {
+        if (rt.combo.includes(this.sortedPersonas[0].key)) return rt;
+      }
+      return { name:'桥梁型', desc:'在不同力量间穿梭的连接者。你没有极端的偏向，这意味着你能灵活切换角色、协调多方。在游戏中，你是最灵活的存在。' };
+    },
+    charPersonaKey() {
+      return this.selectedChar ? CHAR_TO_PERSONA[this.selectedChar] : null;
+    },
+    matchedPersonaName() {
+      if (!this.charPersonaKey) return '';
+      const p = PERSONAS.find(p => p.key === this.charPersonaKey);
+      return p ? p.name : '';
+    },
+    isCharMatchTop() {
+      if (!this.charPersonaKey) return false;
+      return this.sortedPersonas[0].key === this.charPersonaKey ||
+             this.sortedPersonas[1].key === this.charPersonaKey;
+    },
   },
   methods: {
-    startGame() {
-      this.screen = 'flow';
-      this.step = 0;
-    },
-    flipCard(c) {
-      this.flippedCardId = this.flippedCardId === c.id ? null : c.id;
-    },
+    startGame() { this.screen = 'flow'; this.step = 0; },
+
+    flipCard(c) { this.flippedCardId = this.flippedCardId === c.id ? null : c.id; },
+
     confirmCharacter(c) {
-      const idx = this.selectedChars.indexOf(c.id);
-      if (idx >= 0) {
-        this.selectedChars.splice(idx, 1);
-      } else if (this.selectedChars.length < 2) {
-        this.selectedChars.push(c.id);
-      }
+      this.selectedChar = this.selectedChar === c.id ? null : c.id;
       this.flippedCardId = null;
     },
-    getChar(id) {
-      return this.characters.find(c => c.id === id) || {};
-    },
+
+    getChar(id) { return this.characters.find(c => c.id === id) || {}; },
+
     getOpt(key, id) {
       if (!key || !id) return {};
       const opts = this.s0Options[key];
       return opts ? opts.find(o => o.id === id) || {} : {};
     },
-    getOptName(key, id) {
-      return this.getOpt(key, id).name || '(未选)';
+    getOptName(key, id) { return this.getOpt(key, id).name || '(未选)'; },
+    getOptDesc(key, id) { return this.getOpt(key, id).desc || ''; },
+
+    startTest() {
+      this.testScene = 0;
+      this.testQ = 0;
+      this.testAnswers = new Array(24).fill(null);
+      this.testPhase = 'questions';
+      this.testCompleted = false;
+      this.step = 4;
     },
-    getOptDesc(key, id) {
-      return this.getOpt(key, id).desc || '';
+
+    selectTestOption(idx) {
+      this.testAnswers[this.testGlobalIdx] = idx;
+      setTimeout(() => {
+        if (this.testQ < 5) {
+          this.testQ++;
+        } else {
+          if (this.testScene < 3) {
+            this.testPhase = 'transition';
+          } else {
+            this.testPhase = 'loading';
+            setTimeout(() => {
+              this.testCompleted = true;
+              this.step = 5;
+              this.$nextTick(() => this.drawRadar());
+            }, 2000);
+          }
+        }
+      }, 350);
     },
+
+    enterNextScene() {
+      this.testScene++;
+      this.testQ = 0;
+      this.testPhase = 'questions';
+    },
+
+    drawRadar() {
+      const canvas = this.$refs.radarCanvas;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const size = 380;
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
+      ctx.scale(dpr, dpr);
+
+      const cx = size / 2, cy = size / 2, maxR = 140, n = 10;
+      const sorted = this.sortedPersonas;
+      const maxScore = sorted[0].score || 1;
+      const ordered = PERSONAS.map(p => {
+        const f = sorted.find(s => s.key === p.key);
+        return { ...p, score: f ? f.score : 0 };
+      });
+
+      function getPoint(i, r) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+      }
+
+      // Grid
+      ctx.strokeStyle = '#e0ddd8'; ctx.lineWidth = 0.5;
+      for (let ring = 1; ring <= 4; ring++) {
+        ctx.beginPath();
+        for (let i = 0; i <= n; i++) {
+          const p = getPoint(i % n, maxR * ring / 4);
+          i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath(); ctx.stroke();
+      }
+      // Spokes
+      for (let i = 0; i < n; i++) {
+        const p = getPoint(i, maxR);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(p.x, p.y); ctx.stroke();
+      }
+      // Data
+      ctx.beginPath();
+      ordered.forEach((p, i) => {
+        const r = (p.score / maxScore) * maxR;
+        const pt = getPoint(i, Math.max(r, maxR * 0.08));
+        i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(200, 54, 44, 0.15)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(200, 54, 44, 0.7)'; ctx.lineWidth = 2; ctx.stroke();
+
+      // Dots & labels
+      ctx.font = "13px 'Noto Sans SC', sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ordered.forEach((p, i) => {
+        const r = (p.score / maxScore) * maxR;
+        const pt = getPoint(i, Math.max(r, maxR * 0.08));
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(200, 54, 44, 0.9)'; ctx.fill();
+        const lp = getPoint(i, maxR + 22);
+        ctx.fillStyle = '#1a1a1a'; ctx.fillText(p.name, lp.x, lp.y);
+      });
+    },
+
     resetGame() {
       this.screen = 'entry';
       this.step = 0;
-      this.selectedChars = [];
+      this.selectedChar = null;
       this.flippedCardId = null;
       this.s0Answers = { q1_surface: null, q1_inner: null, q2: null, q3: null };
+      this.testScene = 0;
+      this.testQ = 0;
+      this.testAnswers = new Array(24).fill(null);
+      this.testPhase = 'questions';
+      this.testCompleted = false;
     }
   }
 }).mount('#app');
