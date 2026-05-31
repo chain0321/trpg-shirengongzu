@@ -380,7 +380,8 @@
       <!-- Scene transition screen -->
       <div v-if="testPhase === 'transition'" class="min-h-[80vh] flex flex-col items-center justify-center text-center p-6 sm:p-10 fade-in">
         <h2 class="font-serif-cn text-2xl sm:text-3xl font-bold mb-4">{{ testScenes[testScene].transTitle }}</h2>
-        <p class="text-gray-600 max-w-lg leading-relaxed mb-10 text-sm sm:text-base">{{ testScenes[testScene].transDesc }}</p>
+        <p class="text-gray-600 max-w-lg leading-relaxed mb-6 text-sm sm:text-base">{{ testScenes[testScene].transDesc }}</p>
+        <p class="text-gray-500 max-w-lg leading-relaxed mb-10 text-sm italic bg-[#FFFCF5] border border-[#E8E5DF] rounded-lg px-5 py-4">{{ testScenes[testScene].intro }}</p>
         <button @click="enterNextScene" class="btn-primary">继续 →</button>
       </div>
 
@@ -398,10 +399,6 @@
           <span class="text-gray-400 text-sm">{{ testGlobalIdx + 1 }} / 24</span>
         </div>
         <p class="text-gray-500 text-sm mb-6 ml-6">{{ testScenes[testScene].step }}</p>
-
-        <div class="scene-intro-card mb-8" v-if="testQ === 0">
-          {{ testScenes[testScene].intro }}
-        </div>
 
         <div class="fade-in" :key="testGlobalIdx">
           <div class="text-gray-500 text-xs mb-2">Q{{ testGlobalIdx + 1 }}</div>
@@ -428,47 +425,44 @@
       <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-mark">你的世界档案</h2>
       <p class="text-gray-500 mb-10 ml-6">Step 5 / 5 · {{ selectedChar ? getChar(selectedChar).name : '' }} 的视角</p>
 
-      <!-- Character Info -->
-      <div v-if="selectedChar" class="card p-4 sm:p-6 mb-6">
-        <div class="flex items-center gap-3 sm:gap-4">
-          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
-            <img :src="characterImages[selectedChar]" :alt="getChar(selectedChar).name" class="w-full h-full object-cover">
-          </div>
-          <div>
-            <div class="font-serif-cn text-xl font-bold red-mark">{{ getChar(selectedChar).name }}</div>
-            <p class="text-gray-500 text-xs mt-1">你选择的角色</p>
-          </div>
-        </div>
-        <p class="text-gray-600 mt-3 text-sm leading-relaxed">{{ getChar(selectedChar).desc }}</p>
-      </div>
-
-      <!-- S0 Summary -->
-      <div class="space-y-4 sm:space-y-6 mb-8">
-        <div class="card p-4 sm:p-6">
-          <h3 class="font-serif-cn text-lg font-bold mb-3 sm:mb-4">世界基底</h3>
-          <div class="flex items-center gap-3 flex-wrap">
-            <span class="chip chip-red text-sm px-4 py-2">表层：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
-            <span class="text-gray-400">&times;</span>
-            <span class="chip-red chip text-sm px-4 py-2" style="background:#FCE8E5;color:#C8362C;">里层：{{ getOptName('q1', s0Answers.q1_inner) }}</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 sm:gap-6">
-          <div class="card p-4 sm:p-6">
-            <h3 class="font-serif-cn text-base sm:text-lg font-bold mb-2 sm:mb-3">空间范围</h3>
-            <div class="font-serif-cn text-2xl sm:text-4xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
-            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q2', s0Answers.q2) }}</p>
-          </div>
-          <div class="card p-4 sm:p-6">
-            <h3 class="font-serif-cn text-base sm:text-lg font-bold mb-2 sm:mb-3">时间范围</h3>
-            <div class="font-serif-cn text-2xl sm:text-4xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
-            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
-          </div>
-        </div>
-      </div>
-
       <!-- Personality Test Results -->
       <template v-if="testCompleted">
+
+        <!-- Persona Cards Row: Dominant / Shadow / Selected -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <!-- Selected Character -->
+          <div v-if="selectedChar" class="card p-4 sm:p-5">
+            <p class="text-xs text-gray-400 mb-2 uppercase tracking-wider">你选择的角色</p>
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
+                <img :src="characterImages[selectedChar]" :alt="getChar(selectedChar).name" class="w-full h-full object-cover">
+              </div>
+              <div class="font-serif-cn text-lg font-bold">{{ getChar(selectedChar).name }}</div>
+            </div>
+            <p class="text-gray-500 text-xs leading-relaxed">{{ getChar(selectedChar).desc }}</p>
+          </div>
+
+          <!-- Main Persona -->
+          <div class="card p-4 sm:p-5">
+            <p class="text-xs text-gray-400 mb-2 uppercase tracking-wider">主导人格</p>
+            <h3 class="font-serif-cn text-lg font-bold mb-1">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#C8362C] mr-2"></span>
+              <span class="text-[#C8362C]">{{ sortedPersonas[0].name }}</span>
+            </h3>
+            <p class="text-gray-600 text-xs leading-relaxed mt-2">{{ personaDescriptions[sortedPersonas[0].key].main }}</p>
+          </div>
+
+          <!-- Shadow Persona -->
+          <div class="card p-4 sm:p-5 shadow-border">
+            <p class="text-xs text-gray-400 mb-2 uppercase tracking-wider">影子人格</p>
+            <h3 class="font-serif-cn text-lg font-bold mb-1">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-800 mr-2"></span>
+              {{ sortedPersonas[sortedPersonas.length - 1].name }}
+            </h3>
+            <p class="text-gray-600 text-xs leading-relaxed mt-2">{{ personaDescriptions[sortedPersonas[sortedPersonas.length - 1].key].shadow }}</p>
+          </div>
+        </div>
+
         <!-- Radar Chart -->
         <div class="card p-4 sm:p-6 mb-6">
           <h3 class="font-serif-cn text-lg font-bold mb-4">你的十人小组</h3>
@@ -477,26 +471,8 @@
           </div>
         </div>
 
-        <!-- Main Persona -->
-        <div class="card p-4 sm:p-6 mb-4">
-          <h3 class="font-serif-cn text-lg font-bold mb-3">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#C8362C] mr-2"></span>
-            主导人格：<span class="text-[#C8362C]">{{ sortedPersonas[0].name }}</span>
-          </h3>
-          <p class="text-gray-600 text-sm leading-relaxed">{{ personaDescriptions[sortedPersonas[0].key].main }}</p>
-        </div>
-
-        <!-- Shadow Persona -->
-        <div class="card p-4 sm:p-6 mb-4 shadow-border">
-          <h3 class="font-serif-cn text-lg font-bold mb-3">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-800 mr-2"></span>
-            影子人格：{{ sortedPersonas[sortedPersonas.length - 1].name }}
-          </h3>
-          <p class="text-gray-600 text-sm leading-relaxed">{{ personaDescriptions[sortedPersonas[sortedPersonas.length - 1].key].shadow }}</p>
-        </div>
-
         <!-- Bar Chart -->
-        <div class="card p-4 sm:p-6 mb-4">
+        <div class="card p-4 sm:p-6 mb-6">
           <h3 class="font-serif-cn text-lg font-bold mb-4">人格力量排序</h3>
           <div class="space-y-3">
             <div v-for="p in sortedPersonas" :key="p.key" class="flex items-center gap-3">
@@ -509,8 +485,8 @@
           </div>
         </div>
 
-        <!-- Role Type -->
-        <div class="card p-4 sm:p-6 mb-4">
+        <!-- Role Type + Match Analysis -->
+        <div class="card p-4 sm:p-6 mb-6">
           <h3 class="font-serif-cn text-lg font-bold mb-3">
             <span class="inline-block px-3 py-0.5 rounded bg-[#C8362C] text-white text-xs mr-2">{{ matchedRoleType.name }}</span>
             你在十人小组中的位置
@@ -518,8 +494,7 @@
           <p class="text-gray-600 text-sm leading-relaxed">{{ matchedRoleType.desc }}</p>
         </div>
 
-        <!-- Match Analysis -->
-        <div v-if="charPersonaKey" class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8 mb-6">
+        <div v-if="charPersonaKey" class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8 mb-8">
           <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">角色匹配分析</h3>
           <p class="leading-relaxed opacity-90 text-sm" v-if="isCharMatchTop">
             你选择了<b>{{ getChar(selectedChar).name }}</b>，而测试也显示你的主导人格正是<b>{{ matchedPersonaName }}</b>。
@@ -530,6 +505,28 @@
             <br>这意味着你渴望成为的人，和你本能的反应之间存在张力。
             这种反差恰恰是游戏最有趣的部分——你会在扮演中发现自己从未展现过的那一面。
           </p>
+        </div>
+
+        <!-- S0 Summary: three columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div class="card p-4 sm:p-5">
+            <h3 class="font-serif-cn text-base font-bold mb-3">世界基底</h3>
+            <div class="flex items-center gap-2 flex-wrap text-sm">
+              <span class="chip chip-red px-3 py-1">表：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
+              <span class="text-gray-400 text-xs">&times;</span>
+              <span class="px-3 py-1 rounded text-xs" style="background:#FCE8E5;color:#C8362C;">里：{{ getOptName('q1', s0Answers.q1_inner) }}</span>
+            </div>
+          </div>
+          <div class="card p-4 sm:p-5">
+            <h3 class="font-serif-cn text-base font-bold mb-2">空间范围</h3>
+            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
+            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q2', s0Answers.q2) }}</p>
+          </div>
+          <div class="card p-4 sm:p-5">
+            <h3 class="font-serif-cn text-base font-bold mb-2">时间范围</h3>
+            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
+            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
+          </div>
         </div>
 
         <!-- World Summary -->
