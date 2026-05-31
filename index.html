@@ -382,7 +382,9 @@
         <h2 class="font-serif-cn text-2xl sm:text-3xl font-bold mb-4">{{ testScenes[testScene].transTitle }}</h2>
         <p class="text-gray-600 max-w-lg leading-relaxed mb-6 text-sm sm:text-base">{{ testScenes[testScene].transDesc }}</p>
         <p class="text-gray-500 max-w-lg leading-relaxed mb-10 text-sm italic bg-[#FFFCF5] border border-[#E8E5DF] rounded-lg px-5 py-4">{{ testScenes[testScene].intro }}</p>
-        <button @click="enterNextScene" class="btn-primary">继续 →</button>
+        <button @click="enterNextScene" class="btn-primary mb-4">继续 →</button>
+        <br>
+        <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-sm underline bg-transparent border-none cursor-pointer">跳过测试，直接看报告 →</button>
       </div>
 
       <!-- Loading screen -->
@@ -390,6 +392,7 @@
         <div class="w-7 h-7 bg-[#C8362C] mb-8" style="animation: spin 1.2s ease-in-out infinite;"></div>
         <h2 class="font-serif-cn text-xl font-bold mb-2">正在解析你的人格图谱…</h2>
         <p class="text-gray-500 text-sm">十个声音正在集合</p>
+        <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-sm underline bg-transparent border-none cursor-pointer mt-8">跳过测试，直接看报告 →</button>
       </div>
 
       <!-- Questions -->
@@ -397,6 +400,7 @@
         <div class="flex items-center justify-between mb-2">
           <h2 class="font-serif-cn text-xl sm:text-2xl red-mark">{{ testScenes[testScene].title }}</h2>
           <span class="text-gray-400 text-sm">{{ testGlobalIdx + 1 }} / 24</span>
+          <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-xs underline bg-transparent border-none cursor-pointer ml-4">跳过 →</button>
         </div>
         <p class="text-gray-500 text-sm mb-6 ml-6">{{ testScenes[testScene].step }}</p>
 
