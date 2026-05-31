@@ -428,6 +428,28 @@
       <!-- Personality Test Results -->
       <template v-if="testCompleted">
 
+        <!-- S0 Summary: three columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div class="card p-4 sm:p-5">
+            <h3 class="font-serif-cn text-base font-bold mb-3">世界基底</h3>
+            <div class="flex items-center gap-2 flex-wrap text-sm">
+              <span class="chip chip-red px-3 py-1">表：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
+              <span class="text-gray-400 text-xs">&times;</span>
+              <span class="px-3 py-1 rounded text-xs" style="background:#FCE8E5;color:#C8362C;">里：{{ getOptName('q1', s0Answers.q1_inner) }}</span>
+            </div>
+          </div>
+          <div class="card p-4 sm:p-5">
+            <h3 class="font-serif-cn text-base font-bold mb-2">空间范围</h3>
+            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
+            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q2', s0Answers.q2) }}</p>
+          </div>
+          <div class="card p-4 sm:p-5">
+            <h3 class="font-serif-cn text-base font-bold mb-2">时间范围</h3>
+            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
+            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
+          </div>
+        </div>
+
         <!-- Persona Cards Row: Dominant / Shadow / Selected -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <!-- Selected Character -->
@@ -465,27 +487,13 @@
 
         <!-- Radar Chart -->
         <div class="card p-4 sm:p-6 mb-6">
-          <h3 class="font-serif-cn text-lg font-bold mb-4">你的十人小组</h3>
+          <h3 class="font-serif-cn text-lg font-bold mb-4">人格力量排序</h3>
           <div class="flex justify-center">
             <canvas ref="radarCanvas" width="380" height="380" style="max-width:380px;width:100%;"></canvas>
           </div>
         </div>
 
         <!-- Bar Chart -->
-        <div class="card p-4 sm:p-6 mb-6">
-          <h3 class="font-serif-cn text-lg font-bold mb-4">人格力量排序</h3>
-          <div class="space-y-3">
-            <div v-for="p in sortedPersonas" :key="p.key" class="flex items-center gap-3">
-              <span class="w-12 text-right text-sm font-medium flex-shrink-0">{{ p.name }}</span>
-              <div class="flex-1 bar-track">
-                <div class="bar-fill" :style="{ width: Math.round((p.score / (sortedPersonas[0].score || 1)) * 100) + '%' }"></div>
-              </div>
-              <span class="w-10 text-xs text-gray-500 flex-shrink-0">{{ Math.round((p.score / (sortedPersonas[0].score || 1)) * 100) }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Role Type + Match Analysis -->
         <div class="card p-4 sm:p-6 mb-6">
           <h3 class="font-serif-cn text-lg font-bold mb-3">
             <span class="inline-block px-3 py-0.5 rounded bg-[#C8362C] text-white text-xs mr-2">{{ matchedRoleType.name }}</span>
@@ -505,28 +513,6 @@
             <br>这意味着你渴望成为的人，和你本能的反应之间存在张力。
             这种反差恰恰是游戏最有趣的部分——你会在扮演中发现自己从未展现过的那一面。
           </p>
-        </div>
-
-        <!-- S0 Summary: three columns -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div class="card p-4 sm:p-5">
-            <h3 class="font-serif-cn text-base font-bold mb-3">世界基底</h3>
-            <div class="flex items-center gap-2 flex-wrap text-sm">
-              <span class="chip chip-red px-3 py-1">表：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
-              <span class="text-gray-400 text-xs">&times;</span>
-              <span class="px-3 py-1 rounded text-xs" style="background:#FCE8E5;color:#C8362C;">里：{{ getOptName('q1', s0Answers.q1_inner) }}</span>
-            </div>
-          </div>
-          <div class="card p-4 sm:p-5">
-            <h3 class="font-serif-cn text-base font-bold mb-2">空间范围</h3>
-            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
-            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q2', s0Answers.q2) }}</p>
-          </div>
-          <div class="card p-4 sm:p-5">
-            <h3 class="font-serif-cn text-base font-bold mb-2">时间范围</h3>
-            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
-            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
-          </div>
         </div>
 
         <!-- World Summary -->
