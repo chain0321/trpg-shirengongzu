@@ -213,96 +213,118 @@
 
     <!-- ===== Step 0: intro + structure ===== -->
     <div v-if="step === 0" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
-      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-block">游戏简介</h2>
-      <p class="text-gray-400 text-xs mb-6 ml-6">Step 0 / 5</p>
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-1 red-block">游戏简介</h2>
+      <p class="text-gray-400 mb-6 ml-6 text-xs">Step 0 / 5</p>
 
-      <p class="text-gray-700 leading-loose mb-10 text-sm sm:text-[15px]">
-        《十人小组》是一款一起搭建想象世界的游戏。最终成果是"<b>一个由所有玩家共同塑造的、逻辑自洽的虚构世界</b>"。
-        每名玩家持一个<b>原型人格</b>（类似"角色"），既要完成一条<b>世界线</b>（世界搭建的版块，如法律、信仰、科技···），又要完成一条<b>个人线</b>（你的角色在这个世界中的个人故事）。
+      <!-- 核心定义 -->
+      <div class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-6 mb-6">
+        <p class="text-sm sm:text-base leading-relaxed opacity-95">
+          《十人小组》是一款<b>一起搭建想象世界</b>的游戏。最终成果是——<br class="hidden sm:inline">
+          一个由所有玩家共同塑造的、逻辑自洽的虚构世界。
+        </p>
+      </div>
+
+      <!-- 三个核心概念 -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-8">
+        <div class="card p-3 sm:p-4 text-center">
+          <div class="w-8 h-8 rounded-full bg-[#FCE8E5] text-[#C8362C] text-sm flex items-center justify-center mx-auto mb-2 font-bold">人</div>
+          <div class="font-bold text-sm mb-1">原型人格</div>
+          <div class="text-xs text-gray-500 leading-snug">你在游戏中的"角色"，决定你的行为倾向</div>
+        </div>
+        <div class="card p-3 sm:p-4 text-center">
+          <div class="w-8 h-8 rounded-full bg-[#FCE8E5] text-[#C8362C] text-sm flex items-center justify-center mx-auto mb-2 font-bold">世</div>
+          <div class="font-bold text-sm mb-1">世界线</div>
+          <div class="text-xs text-gray-500 leading-snug">你负责搭建的世界版块，如法律、信仰、科技</div>
+        </div>
+        <div class="card p-3 sm:p-4 text-center">
+          <div class="w-8 h-8 rounded-full bg-[#FCE8E5] text-[#C8362C] text-sm flex items-center justify-center mx-auto mb-2 font-bold">我</div>
+          <div class="font-bold text-sm mb-1">个人线</div>
+          <div class="text-xs text-gray-500 leading-snug">你的角色在这个世界中的个人故事</div>
+        </div>
+      </div>
+
+      <p class="text-gray-500 text-sm leading-relaxed mb-8">
         过程中可能穿插角色扮演、圆桌辩论、推理解密——欢迎多元的表达方式。
       </p>
 
-      <h3 class="font-serif-cn text-lg sm:text-xl font-bold mt-10 mb-4 red-mark">游戏流程</h3>
-      <div class="ml-6 mb-10">
-        <div class="mb-3">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">游戏前</span>
-        </div>
-        <div class="flex gap-6 mb-8 ml-2">
-          <div class="flex-1 flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-[#C8362C] text-white text-sm flex items-center justify-center flex-shrink-0 font-bold">1</span>
-            <div><div class="font-bold text-sm">世界配置</div><div class="text-xs text-gray-500">确定世界的基底、空间和时间维度</div></div>
-          </div>
-          <div class="flex-1 flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-[#C8362C] text-white text-sm flex items-center justify-center flex-shrink-0 font-bold">2</span>
-            <div><div class="font-bold text-sm">选择角色</div><div class="text-xs text-gray-500">从十二原型中选择你的化身</div></div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">游戏开始后</span>
-        </div>
-        <div class="relative ml-4 pl-6 border-l-2 border-[#E8E5DF] space-y-5">
-          <div class="relative">
-            <span class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center font-bold">1</span>
-            <div>
-              <div class="font-bold text-sm">旧世界背景</div>
-              <div class="text-xs text-gray-500 mt-0.5">主持人口述旧世界的规则与历史，玩家据此理解所处时代</div>
+      <!-- 游戏流程 -->
+      <h3 class="font-serif-cn text-xl mb-4 red-mark">游戏流程</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 ml-0">
+        <!-- 游戏前 -->
+        <div class="card p-4">
+          <div class="text-xs font-bold text-[#C8362C] uppercase tracking-wider mb-3">游戏前</div>
+          <div class="space-y-3">
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-[#C8362C] text-white text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">1</span>
+              <div><div class="font-bold text-sm">世界配置</div><div class="text-xs text-gray-500 mt-0.5">确定世界的基底、空间和时间维度</div></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-[#C8362C] text-white text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">2</span>
+              <div><div class="font-bold text-sm">选择角色</div><div class="text-xs text-gray-500 mt-0.5">从十二原型中选择你的化身</div></div>
             </div>
           </div>
-          <div class="relative">
-            <span class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center font-bold">2</span>
-            <div>
-              <div class="font-bold text-sm">角色构建</div>
-              <div class="text-xs text-gray-500 mt-0.5">每位玩家基于原型人格，创建自己的角色身份与背景故事</div>
+        </div>
+        <!-- 游戏开始后 -->
+        <div class="card p-4">
+          <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">游戏开始后</div>
+          <div class="space-y-3">
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">1</span>
+              <div><div class="font-bold text-sm">旧世界背景</div><div class="text-xs text-gray-500 mt-0.5">口述旧世界规则，理解所处时代</div></div>
             </div>
-          </div>
-          <div class="relative">
-            <span class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center font-bold">3</span>
-            <div>
-              <div class="font-bold text-sm">新世界构建</div>
-              <div class="text-xs text-gray-500 mt-0.5">玩家协作搭建新世界的版块：法律、信仰、科技、社会结构</div>
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">2</span>
+              <div><div class="font-bold text-sm">角色构建</div><div class="text-xs text-gray-500 mt-0.5">创建你的角色身份与背景故事</div></div>
             </div>
-          </div>
-          <div class="relative">
-            <span class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center font-bold">4</span>
-            <div>
-              <div class="font-bold text-sm">世界推演</div>
-              <div class="text-xs text-gray-500 mt-0.5">在新世界中推演角色命运，观察世界的自洽与冲突</div>
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">3</span>
+              <div><div class="font-bold text-sm">新世界构建</div><div class="text-xs text-gray-500 mt-0.5">协作搭建法律、信仰、科技、社会</div></div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="w-6 h-6 rounded-full bg-[#1a1a1a] text-white text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">4</span>
+              <div><div class="font-bold text-sm">世界推演</div><div class="text-xs text-gray-500 mt-0.5">推演角色命运，观察自洽与冲突</div></div>
             </div>
           </div>
         </div>
       </div>
 
-      <h3 class="font-serif-cn text-lg sm:text-xl font-bold mb-4 red-mark">注意事项</h3>
-      <div class="space-y-3 mb-10 ml-6">
-        <div class="card p-4 text-sm text-gray-700 leading-relaxed">
-          <span class="text-[#C8362C] font-bold mr-2">·</span><b>零准备：</b>无需提前了解规则或复杂准备，现场会发放规则书，根据流程逐一推进。
-        </div>
-        <div class="card p-4 text-sm text-gray-700 leading-relaxed">
-          <span class="text-[#C8362C] font-bold mr-2">·</span><b>自备工具：</b>每位玩家需准备纸笔或手机，用于记录自己的世界线和角色故事。
-        </div>
-        <div class="card p-4 text-sm text-gray-700 leading-relaxed">
-          <span class="text-[#C8362C] font-bold mr-2">·</span><b>人数与时长：</b>建议 10–12 人参与，游戏时长约 2–3 小时。人数不足也可进行，但世界构建的丰富度会相应降低。
-        </div>
-      </div>
-
-      <h3 class="font-serif-cn text-lg sm:text-xl font-bold mb-4 red-mark">常见问题 Q&A</h3>
-      <div class="space-y-4 mb-10 ml-6">
-        <div class="card p-4">
-          <p class="text-sm font-bold text-gray-800">Q：这个游戏和剧本杀、跑团有什么区别？</p>
-          <p class="text-sm text-gray-600 mt-1">A：没有固定剧本和主持人。故事是世界搭建的副产品，而非预设的剧情。目的是维持世界观自洽，不是为了赢。</p>
-        </div>
-        <div class="card p-4">
-          <p class="text-sm font-bold text-gray-800">Q：需要指定主持人（DM）吗？</p>
-          <p class="text-sm text-gray-600 mt-1">A：不需要。创建房间的人只多一步"填写主题"，之后和其他玩家流程完全一致。</p>
-        </div>
-        <div class="card p-4">
-          <p class="text-sm font-bold text-gray-800">Q：同一个主题可以重复玩吗？</p>
-          <p class="text-sm text-gray-600 mt-1">A：可以。不同的玩家组合、不同的人格选择，会碰撞出完全不同的世界。</p>
+      <!-- 注意事项 -->
+      <h3 class="font-serif-cn text-xl mb-3 red-mark">注意事项</h3>
+      <div class="card p-4 mb-8 ml-0">
+        <div class="space-y-2.5">
+          <div class="flex items-start gap-2 text-sm text-gray-700 leading-relaxed">
+            <span class="text-[#C8362C] font-bold flex-shrink-0 mt-0.5">·</span>
+            <span>无需提前了解规则，现场发放规则书，根据流程逐一推进。</span>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-gray-700 leading-relaxed">
+            <span class="text-[#C8362C] font-bold flex-shrink-0 mt-0.5">·</span>
+            <span>每位玩家需准备纸笔或手机，用于记录世界线和角色故事。</span>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-gray-700 leading-relaxed">
+            <span class="text-[#C8362C] font-bold flex-shrink-0 mt-0.5">·</span>
+            <span>建议 10–12 人参与，时长约 2–3 小时。人数不足也可进行。</span>
+          </div>
         </div>
       </div>
 
-      <button @click="step = 2" class="btn-primary w-full mt-6">去世界配置 →</button>
+      <!-- Q&A -->
+      <h3 class="font-serif-cn text-xl mb-3 red-mark">常见问题</h3>
+      <div class="space-y-2 mb-8 ml-0">
+        <div class="card p-4">
+          <p class="text-sm font-bold text-gray-800 mb-1">Q：和剧本杀、跑团有什么区别？</p>
+          <p class="text-sm text-gray-500 leading-relaxed">没有固定剧本。故事是世界搭建的副产品，目的是维持世界观自洽，不是为了赢。</p>
+        </div>
+        <div class="card p-4">
+          <p class="text-sm font-bold text-gray-800 mb-1">Q：需要指定主持人（DM）吗？</p>
+          <p class="text-sm text-gray-500 leading-relaxed">不需要。创建房间的人只多一步"填写主题"，之后和其他玩家流程一致。</p>
+        </div>
+        <div class="card p-4">
+          <p class="text-sm font-bold text-gray-800 mb-1">Q：同一个主题可以重复玩吗？</p>
+          <p class="text-sm text-gray-500 leading-relaxed">可以。不同的玩家组合、不同的人格选择，会碰撞出完全不同的世界。</p>
+        </div>
+      </div>
+
+      <button @click="step = 2" class="btn-primary w-full">去世界配置 →</button>
     </div>
 
     <!-- ===== Step 2: S0 questionnaire ===== -->
