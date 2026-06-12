@@ -1,5 +1,16 @@
 # trpg-static 工作日志
 
+## 访问数据看板
+
+以下两个链接可直接在浏览器打开，查看实时数据：
+
+- **访问人次：** https://api.countapi.xyz/get/trpg-shirengongzu/visits
+- **完成测试：** https://api.countapi.xyz/get/trpg-shirengongzu/completed
+
+数据来源：CountAPI（免费服务，无需服务器）。页面加载时自动 +1，测试完成时自动 +1。
+
+---
+
 ## 2026-06-12 「选角色」页改版为「原型人格介绍」+ 人格心声
 
 目的转变：页面不再让玩家选角色，而是让玩家了解 12 个原型的世界任务与特质（角色由 DM 线下分配）。
