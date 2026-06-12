@@ -684,18 +684,6 @@
         </div>
       </div>
 
-      <div class="card p-5 text-center max-w-md mx-auto">
-        <div class="flex justify-around">
-          <div>
-            <div class="font-serif-cn text-3xl font-bold text-[#C8362C]">{{ visitCount !== null ? visitCount : '—' }}</div>
-            <div class="text-xs text-gray-400 mt-1">访问人次</div>
-          </div>
-          <div>
-            <div class="font-serif-cn text-3xl font-bold text-[#C8362C]">{{ completeCount !== null ? completeCount : '—' }}</div>
-            <div class="text-xs text-gray-400 mt-1">完成测试</div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1148,8 +1136,6 @@ createApp({
       returnScreen: 'entry',
       step: 0,
       testOnly: false,
-      visitCount: null,
-      completeCount: null,
       selectedChar: null,
       flippedCardId: null,
       voiceChar: null,
@@ -1312,12 +1298,6 @@ createApp({
     },
     outsiderNote() { return OUTSIDER_INFO.note; },
   },
-  mounted() {
-    fetch('https://api.countapi.xyz/hit/trpg-shirengongzu/visits')
-      .then(r => r.json()).then(d => this.visitCount = d.value).catch(() => {});
-    fetch('https://api.countapi.xyz/get/trpg-shirengongzu/completed')
-      .then(r => r.json()).then(d => this.completeCount = d.value).catch(() => {});
-  },
   methods: {
     startGame() { this.testOnly = false; this.screen = 'flow'; this.step = 0; },
 
@@ -1426,8 +1406,6 @@ createApp({
               this.testCompleted = true;
               this.step = 5;
               this.$nextTick(() => this.drawRadar());
-              fetch('https://api.countapi.xyz/hit/trpg-shirengongzu/completed')
-                .then(r => r.json()).then(d => this.completeCount = d.value).catch(() => {});
             }, 2000);
           }
         }
