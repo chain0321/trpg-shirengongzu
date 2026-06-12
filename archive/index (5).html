@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="assets-base64.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif; color: #1a1a1a; background: #FAFAF7; margin: 0; }
     .font-serif-cn { font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif; }
@@ -89,68 +89,6 @@
       background: #FFFCF5;
     }
     .character-img { aspect-ratio: 1; object-fit: cover; width: 100%; display: block; background: #f3f1ed; }
-
-    .domain-chip {
-      display: inline-block; padding: 1px 7px; border-radius: 3px;
-      font-size: 0.62rem; font-weight: 500; letter-spacing: 2px;
-      white-space: nowrap; flex-shrink: 0;
-    }
-
-    /* ===== Voice (人格心声) overlay ===== */
-    .voice-overlay {
-      position: fixed; inset: 0; z-index: 60;
-      background: rgba(18, 14, 10, 0.88);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 1.4rem; padding: 1.5rem;
-    }
-    /* 手写信 */
-    .voice-card {
-      position: relative; cursor: pointer;
-      width: 100%; max-width: 420px;
-      padding: 3rem 2.4rem;
-      background: #F7EFDC;
-      background-image:
-        radial-gradient(ellipse at 20% 10%, rgba(120, 90, 40, 0.06), transparent 55%),
-        radial-gradient(ellipse at 85% 90%, rgba(120, 90, 40, 0.08), transparent 50%);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 0 60px rgba(140, 105, 50, 0.12);
-      transform: rotate(-0.8deg);
-      animation: voiceIn 0.4s ease;
-    }
-    .voice-text {
-      font-family: 'Ma Shan Zheng', 'Kaiti SC', 'KaiTi', '楷体', cursive;
-      font-size: 1.5rem; line-height: 2.1; color: #2c2418;
-      letter-spacing: 1px;
-    }
-    .voice-hint { color: rgba(240, 235, 225, 0.5); font-size: 0.8rem; letter-spacing: 3px; }
-    @keyframes voiceIn {
-      from { opacity: 0; transform: rotate(-0.8deg) translateY(18px) scale(0.97); }
-      to   { opacity: 1; transform: rotate(-0.8deg); }
-    }
-    /* 焚烧：火线自下而上一条线吞掉信纸（1.3s） */
-    .voice-card.burning {
-      pointer-events: none;
-      animation: burnClip 1.3s ease-in forwards;
-    }
-    @keyframes burnClip {
-      0%   { clip-path: inset(-30px -30px 0% -30px); }
-      25%  { filter: sepia(0.35) brightness(1.02); }
-      70%  { filter: sepia(0.8) brightness(0.8) contrast(1.05); }
-      100% { clip-path: inset(-30px -30px 102% -30px); filter: sepia(1) brightness(0.55); }
-    }
-    .burn-edge {
-      position: absolute; left: -16px; right: -16px; height: 64px; bottom: -3%;
-      pointer-events: none; z-index: 2;
-      background:
-        radial-gradient(ellipse 28% 90% at 12% 100%, rgba(255, 190, 60, 0.95), transparent 70%),
-        radial-gradient(ellipse 36% 100% at 38% 100%, rgba(255, 100, 0, 0.95), transparent 72%),
-        radial-gradient(ellipse 26% 85% at 64% 100%, rgba(255, 170, 30, 0.9), transparent 70%),
-        radial-gradient(ellipse 42% 95% at 90% 100%, rgba(255, 120, 10, 0.9), transparent 72%),
-        linear-gradient(to top, rgba(35, 14, 4, 0.98) 8%, rgba(140, 45, 5, 0.65) 45%, transparent 100%);
-      filter: blur(5px);
-      animation: burnRise 1.3s ease-in forwards, burnFlicker 0.1s linear infinite alternate;
-    }
-    @keyframes burnRise { from { bottom: -3%; } to { bottom: 103%; } }
-    @keyframes burnFlicker { from { transform: scaleY(1); opacity: 1; } to { transform: scaleY(1.18) translateY(-3px); opacity: 0.85; } }
 
     .opt-card {
       cursor: pointer; transition: all 200ms;
@@ -253,7 +191,7 @@
         <button @click="startGame" class="btn-primary">游戏参与者</button>
         <button @click="startTestOnly" class="btn-outline">人格测试</button>
       </div>
-      <p class="text-xs text-gray-400 mt-2">v4.0 · 参与游戏含世界配置 + 原型人格 + 人格测试</p>
+      <p class="text-xs text-gray-400 mt-2">v4.0 · 参与游戏含世界配置 + 选角色 + 人格测试</p>
     </div>
   </div>
 
@@ -265,9 +203,12 @@
       <div class="flex gap-1 sm:gap-2 flex-nowrap items-center overflow-x-auto">
         <span :class="['step-pill', step === 0 ? 'active' : step > 0 ? 'done' : '']">简介</span>
         <span :class="['step-pill', step === 2 ? 'active' : step > 2 ? 'done' : '']">配置</span>
-        <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']">人格</span>
+        <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']">选角色</span>
         <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']">测试</span>
         <span :class="['step-pill', step === 5 ? 'active' : '']">报告</span>
+      </div>
+      <div class="text-gray-500 text-xs hidden sm:block flex-shrink-0 ml-2">
+        {{ selectedChar ? getChar(selectedChar).name : '未选角色' }}
       </div>
     </div>
 
@@ -304,14 +245,14 @@
             <span class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-[#C8362C] text-white text-xs flex items-center justify-center font-bold">1</span>
             <div>
               <div class="font-bold text-sm">世界配置</div>
-              <div class="text-xs text-gray-500 mt-0.5">确定世界的基底、空间和时间维度（本测试界面完成）</div>
+              <div class="text-xs text-gray-500 mt-0.5">确定世界的基底、空间和时间维度</div>
             </div>
           </div>
           <div class="relative">
             <span class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-[#C8362C] text-white text-xs flex items-center justify-center font-bold">2</span>
             <div>
               <div class="font-bold text-sm">选择人格</div>
-              <div class="text-xs text-gray-500 mt-0.5">确定你构建世界和角色扮演的视角（群接龙选择，界面辅助测试）</div>
+              <div class="text-xs text-gray-500 mt-0.5">确定你构建世界和角色扮演的视角</div>
             </div>
           </div>
           <div class="relative">
@@ -468,9 +409,9 @@
         </div>
       </div>
 
-      <div :class="['card p-4 sm:p-5 mb-4 sm:mb-6', s0Valid ? 'border-2 border-[#C8362C]' : '']">
+      <div class="card p-4 sm:p-5 mb-4 sm:mb-6">
         <h3 class="font-serif-cn text-lg font-bold mb-1">你的世界预览</h3>
-        <p class="text-lg text-[#C8362C] mb-3">请截图选项，发给DM~</p>
+        <p class="text-xs text-[#C8362C] mb-3">请截图选项，发给DM~</p>
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div><span class="text-gray-400">表世界</span><br><b>{{ s0Answers.q1_surface ? getOptName('q1', s0Answers.q1_surface) : '···' }}</b></div>
           <div><span class="text-gray-400">里世界</span><br><b>{{ s0Answers.q1_inner ? getOptName('q1', s0Answers.q1_inner) : '···' }}</b></div>
@@ -480,62 +421,48 @@
       </div>
 
       <button @click="step = 3" :disabled="!s0Valid" class="btn-primary w-full">
-        提交，查看角色介绍 →
+        提交，去选角色 →
       </button>
-      <p v-if="!s0Valid" class="text-gray-500 text-sm text-center mt-3">完成选项后，截图发给DM</p>
+      <p v-if="!s0Valid" class="text-gray-500 text-sm text-center mt-3">请完成所有题</p>
     </div>
 
     <!-- ===== Step 3: character selection (1 character) ===== -->
     <div v-else-if="step === 3" class="max-w-6xl mx-auto px-3 py-6 sm:p-6 md:p-10">
-      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-block">原型人格介绍</h2>
-      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">查看人格的世界任务，点击卡片进入人格心声</p>
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-block">选择你的原型角色</h2>
+      <p class="text-gray-500 mb-6 sm:mb-10 ml-6 text-sm sm:text-base">Step 3 / 5 · 选择 1 个你最想扮演的角色 · 点击卡片翻转查看简介</p>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-8">
         <div v-for="c in characters" :key="c.id"
              @click="flipCard(c)"
-             :class="['character-card', flippedCardId === c.id ? 'flipped' : '']">
+             :class="['character-card',
+                      selectedChar === c.id ? 'selected' : '',
+                      flippedCardId === c.id ? 'flipped' : '']">
           <div class="card-inner">
             <div class="card-face card-front">
               <img :src="characterImages[c.id]" :alt="c.name" class="character-img">
               <div class="p-2 sm:p-3">
-                <div class="flex items-center justify-between gap-1">
-                  <div class="font-serif-cn text-sm sm:text-lg font-bold">{{ c.name }}</div>
-                  <span class="domain-chip" :style="{ background: domains[c.domain].bg, color: domains[c.domain].color }">{{ domains[c.domain].name }}</span>
-                </div>
-                <div class="text-xs text-gray-400 mt-1">世界线 · <span class="font-medium" :style="{ color: domains[c.domain].color }">{{ c.line }}</span></div>
+                <div class="font-serif-cn text-sm sm:text-lg font-bold">{{ c.name }}</div>
+                <div class="text-xs text-[#C8362C] mt-1 font-medium" v-if="selectedChar === c.id">&#10003; 你的选择</div>
+                <div class="text-xs text-gray-400 mt-1" v-else>点击查看简介</div>
               </div>
             </div>
             <div class="card-face card-back">
               <div>
-                <div class="flex items-center justify-between gap-1 mb-2">
-                  <div class="font-serif-cn text-xl font-bold red-mark">{{ c.name }}</div>
-                  <span class="domain-chip" :style="{ background: domains[c.domain].bg, color: domains[c.domain].color }">{{ domains[c.domain].name }}</span>
-                </div>
-                <div class="text-[10px] text-gray-400 tracking-widest mb-1.5">世界任务</div>
-                <ul class="space-y-1.5">
-                  <li v-for="t in c.tasks" class="text-xs text-gray-700 leading-relaxed flex gap-1.5">
-                    <span class="text-[#C8362C] flex-shrink-0">&#9642;</span><span>{{ t }}</span>
-                  </li>
-                </ul>
+                <div class="font-serif-cn text-2xl font-bold mb-3 red-mark">{{ c.name }}</div>
+                <p class="text-sm text-gray-700 leading-relaxed">{{ c.desc }}</p>
               </div>
               <div class="mt-3">
-                <button @click.stop="openVoice(c)" class="btn-primary w-full text-sm py-2">听 TA 的心声</button>
+                <button @click.stop="confirmCharacter(c)"
+                        :class="selectedChar === c.id ? 'btn-outline w-full text-sm py-2' : 'btn-primary w-full text-sm py-2'">
+                  {{ selectedChar === c.id ? '取消选择' : '选择此角色' }}
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sticky bottom-0 bg-[#FAFAF7] py-3 sm:py-4 px-2 sm:px-0 border-t border-[#E8E5DF]">
-        <p class="text-gray-500 text-sm sm:text-base">翻开卡片，听听十二个人格的心声</p>
-        <button @click="startTest" class="btn-primary w-full sm:w-auto">进入人格测试 →</button>
-      </div>
-
-      <!-- voice (人格心声) overlay -->
-      <div v-if="voiceChar" class="voice-overlay" @click.self="closeVoice">
-        <div :class="['voice-card', voiceBurning ? 'burning' : '']" @click="burnVoice">
-          <p class="voice-text">{{ voiceText }}</p>
-          <div v-if="voiceBurning" class="burn-edge"></div>
-        </div>
-        <p class="voice-hint" v-if="!voiceBurning">点 燃 这 封 信</p>
+        <p class="text-gray-700 text-sm sm:text-base">选中：<b>{{ selectedChar ? getChar(selectedChar).name : '— 未选择 —' }}</b></p>
+        <button @click="startTest" :disabled="!selectedChar" class="btn-primary w-full sm:w-auto">确认，进入人格测试 →</button>
       </div>
     </div>
 
@@ -549,7 +476,7 @@
         <p class="text-gray-500 max-w-lg leading-relaxed mb-10 text-sm italic bg-[#FFFCF5] border border-[#E8E5DF] rounded-lg px-5 py-4">{{ testScenes[testScene].intro }}</p>
         <button @click="startSceneQuestions" class="btn-primary mb-4">继续 →</button>
         <br>
-        <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-sm underline bg-transparent border-none cursor-pointer">结束测试 →</button>
+        <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-sm underline bg-transparent border-none cursor-pointer">跳过测试，直接看报告 →</button>
       </div>
 
       <!-- Loading screen -->
@@ -557,7 +484,7 @@
         <div class="w-7 h-7 bg-[#C8362C] mb-8" style="animation: spin 1.2s ease-in-out infinite;"></div>
         <h2 class="font-serif-cn text-xl font-bold mb-2">正在解析你的人格图谱…</h2>
         <p class="text-gray-500 text-sm">十个声音正在集合——门外，还站着两个</p>
-        <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-sm underline bg-transparent border-none cursor-pointer mt-8">结束测试 →</button>
+        <button @click="step = 5" class="text-gray-400 hover:text-[#C8362C] text-sm underline bg-transparent border-none cursor-pointer mt-8">跳过测试，直接看报告 →</button>
       </div>
 
       <!-- Questions -->
@@ -592,7 +519,7 @@
     <!-- ===== Step 5: Combined Report ===== -->
     <div v-else-if="step === 5" class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
       <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-block">你的世界档案</h2>
-      <p class="text-gray-500 mb-10 ml-6">Step 5 / 5</p>
+      <p class="text-gray-500 mb-10 ml-6">Step 5 / 5<span v-if="selectedChar && !testOnly"> · {{ getChar(selectedChar).name }} 的视角</span></p>
 
       <!-- Personality Test Results -->
       <template v-if="testCompleted">
@@ -619,8 +546,20 @@
           </div>
         </div>
 
-        <!-- Persona Cards Row: Dominant / Shadow -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <!-- Persona Cards Row: Dominant / Shadow / Selected -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <!-- Selected Character -->
+          <div v-if="selectedChar" class="card p-4 sm:p-5">
+            <p class="text-xs text-gray-400 mb-2 uppercase tracking-wider">你选择的角色</p>
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#E8E5DF]">
+                <img :src="characterImages[selectedChar]" :alt="getChar(selectedChar).name" class="w-full h-full object-cover">
+              </div>
+              <div class="font-serif-cn text-lg font-bold">{{ getChar(selectedChar).name }}</div>
+            </div>
+            <p class="text-gray-500 text-xs leading-relaxed">{{ getChar(selectedChar).desc }}</p>
+          </div>
+
           <!-- Main Persona -->
           <div class="card p-4 sm:p-5">
             <p class="text-xs text-gray-400 mb-2 uppercase tracking-wider">主导人格</p>
@@ -669,11 +608,25 @@
           <p class="text-gray-400 text-xs leading-relaxed mt-3">{{ outsiderNote }} 在 {{ testQuestions.length }} 道题中，你有 {{ outsiderPickCount }} 次选择了外来者的声音。</p>
         </div>
 
+        <div v-if="!testOnly && charPersonaKey" class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8 mb-8">
+          <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">角色匹配分析</h3>
+          <p class="leading-relaxed opacity-90 text-sm" v-if="isCharMatchTop">
+            你选择了<b>{{ getChar(selectedChar).name }}</b>，而测试也显示你的主导人格正是<b>{{ matchedPersonaName }}</b>。
+            <br>你对自己的了解很清醒——你选择了最熟悉的力量。在游戏中，这会让你如鱼得水。
+          </p>
+          <p class="leading-relaxed opacity-90 text-sm" v-else>
+            你选择了<b>{{ getChar(selectedChar).name }}</b>，但测试显示你的主导人格是<b>{{ sortedPersonas[0].name }}</b>。
+            <br>这意味着你渴望成为的人，和你本能的反应之间存在张力。
+            这种反差恰恰是游戏最有趣的部分——你会在扮演中发现自己从未展现过的那一面。
+          </p>
+        </div>
+
         <!-- World Summary -->
         <div v-if="!testOnly" class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8">
           <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">你的世界简述</h3>
           <p class="leading-relaxed opacity-90 text-sm">
-            这个世界以<b>{{ getOptName('q1', s0Answers.q1_surface) }}</b>为表层结构，
+            这是一个由<b>{{ selectedChar ? getChar(selectedChar).name : '' }}</b>观察的世界。
+            它以<b>{{ getOptName('q1', s0Answers.q1_surface) }}</b>为表层结构，
             以<b>{{ getOptName('q1', s0Answers.q1_inner) }}</b>为深层逻辑。
             故事发生在一个<b>{{ getOptName('q2', s0Answers.q2) }}</b>级别的空间里，
             跨越<b>{{ getOptName('q3', s0Answers.q3) }}</b>的时间维度。
@@ -709,113 +662,6 @@ const PERSONAS = [
   { key:'ferry',  name:'摆渡人', color:'#3498DB' },
   { key:'scribe', name:'史官',   color:'#F39C12' },
 ];
-
-// 四大领域：天地 / 社会 / 人欲 / 未知
-const DOMAINS = {
-  tiandi: { name: '天地', color: '#41776B', bg: '#E8F0ED' },
-  shehui: { name: '社会', color: '#9A6A1F', bg: '#F5EEDF' },
-  renyu:  { name: '人欲', color: '#C8362C', bg: '#FCE8E5' },
-  weizhi: { name: '未知', color: '#5F5F6E', bg: '#EBEBEF' }
-};
-
-// 人格心声【应急备份】：正式心声库在仓库根目录 voices.md（页面加载时读取并覆盖此处）。
-// 日常增删改请编辑 voices.md，不要改这里；此备份仅在 voices.md 读取失败时生效。
-const PERSONA_VOICES = {
-  baojun: [
-    '让他们骂吧。城墙立起来那天，他们自然会闭嘴。',
-    '投票？十二个人讨论到天亮，狼群可不等天亮。',
-    '等这一切完成，我就解放自己。这句话，我说了三十年。',
-    '城墙外是荒野，城墙内是骂声。我站在墙上，两边都听得见。',
-    '你们恨我恨得这么齐心。看，这就是团结。',
-    '粮仓只够撑四十天。今晚我下令封仓，明天广场上会烧我的草人。烧吧——草人不饿。',
-    '瘟疫进城第三天，我下令烧了东市。他们至今在灰里骂我，可没人再咳血。',
-    '桥修到第七年，监工死了三个，民夫逃了一半。今天第一辆粮车过了桥，我在桥头站了一夜。',
-    '船队只剩三天淡水。我把全部的酒倒进海里，包括我自己那壶。水手们盯着我，我盯着海图。',
-    '避难所的氧气只够一半人。名单是我一个人写的，写完，我把那支笔折了。',
-    '他们说山神发怒，要献童男童女。我把祭司绑上了祭坛——山神若要人，先吃他的仆人。第二年，山还是那座山。',
-    '围城第九十天，副官劝我开城，说能保全百姓。我关了他禁闭，然后照着他的方案，谈了三个月。',
-    '铁路必须在入冬前通到北镇，不然三万人挨饿。工期我砍一半，工钱我翻一倍，骂名我自己背。',
-    '登基誓词一百二十个字，我现在只记得一句：灾年，君先减膳。今年，是第三个灾年了。',
-    '他们在地下室印传单，画我吊死在钟楼上。我让卫兵送了一批好纸过去——那纸太糙，印不清我的脸。',
-    '二十年前我推开会议室的门，里面坐着九个犹豫的人。如今他们的画像挂满走廊，被尊为奠基者。没有我的——我还活着，还在开会。',
-    '儿子问我，为什么所有人都怕你。我说：等你哪天要在两百人里挑五十个去死，你就懂了。我希望你永远不懂。',
-    '新来的书记官翻完档案，问我夜里睡得着吗。我说，睡得着的那种人，不配签那个字。',
-    '起义军清点我的寝宫，只搜出一张行军床、一柜地图。听说他们的首领愣了很久，当晚就睡在了那张床上。',
-    '月光照在城墙上的时候，我想：再撑一年。就一年。'
-  ],
-  xiaochou: [
-    '葬礼上不许笑？可他生前最爱听我学驴叫。',
-    '大家都在认真讨论世界末日。太严肃了，得有人放个屁。',
-    '避难所的孩子问我外面什么样。我说外面是个特别大的游乐场，正在检修。大人们瞪我，孩子睡着了。',
-    '集市口我演了十年。卖炊饼的老张走了，他儿子头一天出摊，我把老张的吆喝学给他听。他一边笑一边哭，多塞给我两个饼。',
-    '宫里新来的小太监挨了二十板子，趴在柴房里哭。我蹲在窗外学了半个时辰猫叫。他骂了句"疯子"，笑了。',
-    '攻城前夜，整条战壕没人说话。我把头盔反着戴，学了一段将军训话。笑声传出去三里地，对面的弓箭手也在笑。',
-    '领主禁了集会，禁了酒馆，禁了歌谣。我倒立着把布告念了一遍。第二天布告多了一条：禁止倒立。',
-    '他们押我游街，罪名是"侮辱王冠"。我一路朝两边扮鬼脸。笑得最响那个，是去年给我定罪的法官家的小儿子。',
-    '直播间三万人刷"哈哈哈"。下播之后，屋里静得能听见冰箱响。外卖到了，我说了声谢谢——今天第一句不是台词的话。',
-    '那天我笑到停不下来，大夫说不是病，是攒了二十年的笑一起要出来。他们把我锁了三天。我隔着门给看守讲段子，第二天锁拆了——说与其听门后的，不如开门看着讲。',
-    '粥棚的队伍太安静了。我插队、滑倒、把空碗扣在头上。全队笑了，连守粥的兵都笑了。然后我拍拍灰，排回最后一个。',
-    '刑场上神父念经，我讲段子。那犯人是笑着上绞架的。后来神父问我信什么。我说我信"最后一刻别那么冷"。',
-    '国王砍了丞相全家那晚，点名要听新段子。我讲了个刽子手的，他笑了，赏了金币。金币上有个红指印，我没敢擦。',
-    '婚礼上我学了新郎写给前任的诗。满堂大笑，只有两个人没笑。有些场子，我收钱让它热；有些场子，我倒贴钱让它当场冷掉。',
-    '我把市长的演讲稿和我的台本调了包。他对着三千人念到"接下来是喷火环节"才发现。罚我扫了一个月街——可那个月，全城都在背他稿子里真正写了什么。',
-    '教堂募捐箱三年没满过。我在箱上画了只会眨眼的小鬼，写：不捐的人，他记名字。一个月就满了。神父谢了上帝，没谢我。挺好，我和上帝经常换班。',
-    '老国王临终前屏退所有大臣，单独留我。他说，这些年只有你敢拿我开玩笑，再说个新的吧。我张了张嘴。那是我此生唯一一次冷场。',
-    '王后小产那个冬天，整座宫殿不许出声。只有我被叫进寝殿。讲什么都行，她说，讲到我哭出来为止。',
-    '贵族们花重金请我暖场。一半的钱是请我逗笑，另一半，是求我那晚别讲某几个段子。我的沉默比我的笑话贵。',
-    '丰收节请我去演，价钱翻倍。到了才知道，今年蝗灾，颗粒无收。村长说：就因为没收成，才更得请你来。'
-  ],
-  shiguan: [
-    '正在发生的瞬间，在我笔下已经是过去。',
-    '我不参与。但一百年后，只有我的版本会被记住。',
-    '记忆不是无形的，它压得我手腕生疼。'
-  ],
-  jiaoshou: [
-    '即使我知道真理，又该怎么和这世界相处呢？',
-    '我说的每句话自然有些道理。可我得到的反馈，不该如此。',
-    '规律如此明晰，人们总该知道接下去怎么选——我曾这样以为。'
-  ],
-  faguan: [
-    '我无数次坐在审判席上喊出有罪或无罪。这一次，我说不出任何为自己辩护的话。',
-    '规则高于一切，包括我自己。这句话最贵的，是后半句。',
-    '当年那个决定是否无愧？橡木座钟摆了三十年，还在问。'
-  ],
-  panjun: [
-    '让他走运吧，脆弱的人类。记住，我是你们的一部分。',
-    '我看见你藏在面具下的那点渴望了。别怕，它很美。',
-    '你永远无法摆脱的影子，向你问好。'
-  ],
-  yongheng: [
-    '烧掉它的火光里，逃出去几页。世界不会知道，那是我真正的模样。',
-    '他们劝我成熟一点。我数了数，他们说这话时，眼里的光灭了。',
-    '风除了灰烬什么都没有带走。所以我继续走。'
-  ],
-  baidu: [
-    '旅人们，醒来吧。这是唯一的路，这无法折返的幽暗之地。',
-    '你的渡口不在这里。走吧。',
-    '渡人亦渡己。成为摆渡人的第一天，我就在学这五个字。'
-  ],
-  lingpo: [
-    '未来早就写在了过去。你视而不见，反倒称之为命运。',
-    '用它驱散黑夜吧，火焰会记得你。',
-    '我不给答案。答案太轻，火种才压得住命。'
-  ],
-  waiA: [
-    '我站在门缝里看你们围着火堆。那道光，像一封没寄给我的信。',
-    '学你们的口音，学你们的笑。学得越像，越没人问我从哪里来。',
-    '如果有一天我敲门，请假装这就是我的归途。'
-  ],
-  waiB: [
-    '我就站在人群中央，隔着一层玻璃。',
-    '故乡？我观测它，记录它，唯独不回去。',
-    '你们叫它流浪，我叫它出走。词不一样，路就不一样。'
-  ],
-  x: [
-    '人总是一边抱怨任务，一边日复一日地完成任务。我就是你们的然后。',
-    '平静湖面之下，连我也不知晓自己是什么。',
-    '抽一张吧——幸运、灵异、人性、神秘。反正你早晚会抽到我。'
-  ]
-};
 
 const CHAR_TO_PERSONA = {
   faguan:   'judge',
@@ -1140,11 +986,6 @@ createApp({
       testOnly: false,
       selectedChar: null,
       flippedCardId: null,
-      voiceChar: null,
-      voiceText: '',
-      voiceBurning: false,
-      voiceDecks: {},
-      voicePools: Object.assign({}, PERSONA_VOICES),
       characterImages: window.CHARACTER_IMAGES || {},
       s0Answers: { q1_surface: null, q1_inner: null, q2: null, q3: null },
 
@@ -1161,44 +1002,19 @@ createApp({
       personaList: PERSONAS,
       personaDescriptions: PERSONA_DESCRIPTIONS,
 
-      domains: DOMAINS,
       characters: [
-        { id: 'shiguan',  name: '史官',     domain: 'tiandi', line: '历史',
-          desc: '不参与，只记录。在他眼里，正在发生的瞬间已经是过去。',
-          tasks: ['开局抛出第一条线索与大事件', '从众人的设定中提炼关键大事件', '持 3 张大事件卡，随时引爆历史'] },
-        { id: 'jiaoshou', name: '教授',     domain: 'shehui', line: '真理',
-          desc: '用一套理论解释世界，包括它解释不了的部分。',
-          tasks: ['设定科技、规律与新发现', '拟定文明的晨间计划', '每回合提出危机解决方案'] },
-        { id: 'baojun',   name: '暴君',     domain: 'shehui', line: '权力',
-          desc: '"君子远庖厨，所有人都想当君子，我来做那个坏人。"',
-          tasks: ['定下十人去往新世界的共同原因', '创造权力工具与权力空间', '可强制执行计划，篡改一次历史'] },
-        { id: 'faguan',   name: '法官',     domain: 'shehui', line: '秩序',
-          desc: '相信规则高于一切，包括他自己。',
-          tasks: ['设定新世界的准入与禁入准则', '制定并维护三条公约', '持 3 次审判权，惩戒违约者'] },
-        { id: 'xiaochou', name: '小丑',     domain: 'renyu',  line: '人性',
-          desc: '用玩笑揭穿一切严肃。最不像真心的人，往往说出最尖锐的真相。',
-          tasks: ['预埋一个改变局势的"玩笑"', '每回合裁定计划的正负后果', '掷出命运，决定故事走向'] },
-        { id: 'panjun',   name: '叛君',     domain: 'renyu',  line: '欲望',
-          desc: '推翻旧秩序的人，深知自己终将成为下一个被推翻者。',
-          tasks: ['建立十人之间的三组暗线关系', '持 5 张心声卡，可操控所有人的影子人格叙事'] },
-        { id: 'yongheng', name: '永恒少年', domain: 'renyu',  line: '信仰',
-          desc: '拒绝长大，因为长大意味着妥协。',
-          tasks: ['写下两件"丢弃之物"，由众人投票定出新世界的至尊与禁忌', '与教授共备晨间资料包'] },
-        { id: 'baidu',    name: '摆渡人',   domain: 'tiandi', line: '生死',
-          desc: '在已知与未知之间穿行，把人送过去，自己却从不上岸。',
-          tasks: ['设定通往异世界的仪式与区域', '写下 3 条命运判词', '摆渡死亡的玩家，渡人亦渡己'] },
-        { id: 'lingpo',   name: '灵婆',     domain: 'tiandi', line: '预言',
-          desc: '"未来早就写在了过去。潜意识指引了我们的人生，你视而不见，反倒称之为命运。"',
-          tasks: ['以意象与画面，两次启示新世界', '设定白房子——十人集结的起点'] },
-        { id: 'waiA',     name: '外来者A',  domain: 'weizhi', line: '归途',
-          desc: '从另一个世界闯入的局外人，用陌生的眼光打量这里的一切。',
-          tasks: ['不受准入准则约束，自带一个文明', '与 X、史官共解十字谜团', '每回合揭示一条危机'] },
-        { id: 'waiB',     name: '外来者B',  domain: 'weizhi', line: '出走',
-          desc: '另一个外来者。同样的身份，不同的来路与目的。',
-          tasks: ['不受准入准则约束，自带一个文明', '与 X、史官共解十字谜团', '每回合揭示一条危机'] },
-        { id: 'x',        name: 'X',        domain: 'weizhi', line: '混沌',
-          desc: '"人总是一边抱怨任务，一边日复一日地完成任务。我就是你们的然后。"',
-          tasks: ['开局埋下贯穿全场的谜团', '为世界定调：幸运 / 灵异 / 人性 / 神秘', '每回合抽取并叙述随机事件'] }
+        { id: 'panjun',   name: '叛君',     desc: '推翻旧秩序的人，深知自己终将成为下一个被推翻者。' },
+        { id: 'shiguan',  name: '史官',     desc: '不参与，只记录。在他眼里，正在发生的瞬间已经是过去。' },
+        { id: 'waiA',     name: '外来者A',  desc: '从另一个世界闯入的局外人，用陌生的眼光打量这里的一切。' },
+        { id: 'waiB',     name: '外来者B',  desc: '另一个外来者。同样的身份，不同的来路与目的。' },
+        { id: 'xiaochou', name: '小丑',     desc: '用玩笑揭穿一切严肃。最不像真心的人，往往说出最尖锐的真相。' },
+        { id: 'baidu',    name: '摆渡人',   desc: '在已知与未知之间穿行，把人送过去，自己却从不上岸。' },
+        { id: 'jiaoshou', name: '教授',     desc: '用一套理论解释世界，包括它解释不了的部分。' },
+        { id: 'baojun',   name: '暴君',     desc: '"君子远庖厨，所有人都想当君子，我来做那个坏人。"' },
+        { id: 'yongheng', name: '永恒少年', desc: '拒绝长大，因为长大意味着妥协。' },
+        { id: 'faguan',   name: '法官',     desc: '相信规则高于一切，包括他自己。' },
+        { id: 'lingpo',   name: '灵婆',     desc: '"未来早就写在了过去。潜意识指引了我们的人生，你视而不见，反倒称之为命运。"' },
+        { id: 'x',        name: 'X',        desc: '"人总是一边抱怨任务，一边日复一日地完成任务。我就是你们的然后。"' }
       ],
       s0Options: {
         q1: [
@@ -1316,61 +1132,9 @@ createApp({
 
     flipCard(c) { this.flippedCardId = this.flippedCardId === c.id ? null : c.id; },
 
-    // ===== 人格心声 =====
-    // 心声正文维护在 voices.md（仓库根目录），页面加载时读取；
-    // 读取失败时退回内嵌的 PERSONA_VOICES 应急备份
-    loadVoices() {
-      const NAME_TO_ID = {
-        '史官': 'shiguan', '教授': 'jiaoshou', '暴君': 'baojun', '法官': 'faguan',
-        '小丑': 'xiaochou', '叛君': 'panjun', '永恒少年': 'yongheng', '摆渡人': 'baidu',
-        '灵婆': 'lingpo', '外来者A': 'waiA', '外来者B': 'waiB', 'X': 'x'
-      };
-      fetch('voices.md?v=' + Date.now())
-        .then(r => r.ok ? r.text() : null)
-        .then(txt => {
-          if (!txt) return;
-          const pools = {};
-          let cur = null;
-          txt.split(/\r?\n/).forEach(line => {
-            const h = line.match(/^##\s+(.+?)\s*$/);
-            if (h) { cur = NAME_TO_ID[h[1].trim()] || null; if (cur) pools[cur] = []; return; }
-            const li = line.match(/^[-*]\s+(.+)/);
-            if (li && cur) pools[cur].push(li[1].trim());
-          });
-          Object.keys(pools).forEach(k => {
-            if (pools[k].length) { this.voicePools[k] = pools[k]; this.voiceDecks[k] = null; }
-          });
-        })
-        .catch(() => {});
-    },
-    drawVoice(id) {
-      const pool = (this.voicePools[id] && this.voicePools[id].length) ? this.voicePools[id] : [this.getChar(id).desc];
-      if (!this.voiceDecks[id] || !this.voiceDecks[id].length) {
-        const idxs = pool.map((_, i) => i);
-        for (let i = idxs.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
-        }
-        this.voiceDecks[id] = idxs;
-      }
-      return pool[this.voiceDecks[id].pop()];
-    },
-    openVoice(c) {
-      this.voiceChar = c;
-      this.voiceBurning = false;
-      this.voiceText = this.drawVoice(c.id);
-    },
-    burnVoice() {
-      if (this.voiceBurning) return;
-      this.voiceBurning = true;
-      setTimeout(() => {
-        this.voiceBurning = false;
-        this.voiceChar = null;
-      }, 1350);
-    },
-    closeVoice() {
-      if (this.voiceBurning) return;
-      this.voiceChar = null;
+    confirmCharacter(c) {
+      this.selectedChar = this.selectedChar === c.id ? null : c.id;
+      this.flippedCardId = null;
     },
 
     getChar(id) { return this.characters.find(c => c.id === id) || {}; },
@@ -1502,9 +1266,6 @@ createApp({
       this.testPhase = 'questions';
       this.testCompleted = false;
     }
-  },
-  mounted() {
-    this.loadVoices();
   }
 }).mount('#app');
 </script>
