@@ -196,6 +196,8 @@
     .q-dot.answered { background: #C8362C; }
     .q-dot.current { background: #C8362C; box-shadow: 0 0 0 3px rgba(200,54,44,0.2); }
 
+    canvas { transform: translateZ(0); }
+
     .scene-intro-card {
       background: #FFFCF5; border: 1px solid #E8E5DF; border-radius: 0.5rem;
       padding: 20px 24px; color: #555; font-size: 0.95rem; line-height: 1.8;
@@ -267,8 +269,9 @@
         <span :class="['step-pill', step === 2 ? 'active' : step > 2 ? 'done' : '']">配置</span>
         <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']">人格</span>
         <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']">测试</span>
-        <span :class="['step-pill', step === 5 ? 'active' : '']">报告</span>
+        <span :class="['step-pill', step === 5 ? 'active' : step > 5 ? 'done' : '']">报告</span>
       </div>
+      <button @click="returnScreen = 'flow'; screen = 'about'" class="text-xs text-gray-500 hover:text-[#C8362C] underline bg-transparent border-none cursor-pointer flex-shrink-0 ml-2">关于我们</button>
     </div>
 
     <!-- ===== Step 0: intro + structure ===== -->
@@ -597,28 +600,6 @@
       <!-- Personality Test Results -->
       <template v-if="testCompleted">
 
-        <!-- S0 Summary: three columns -->
-        <div v-if="!testOnly" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div class="card p-4 sm:p-5">
-            <h3 class="font-serif-cn text-base font-bold mb-3">世界基底</h3>
-            <div class="flex items-center gap-2 flex-wrap text-sm">
-              <span class="chip chip-red px-3 py-1">表：{{ getOptName('q1', s0Answers.q1_surface) }}</span>
-              <span class="text-gray-400 text-xs">&times;</span>
-              <span class="px-3 py-1 rounded text-xs" style="background:#FCE8E5;color:#C8362C;">里：{{ getOptName('q1', s0Answers.q1_inner) }}</span>
-            </div>
-          </div>
-          <div class="card p-4 sm:p-5">
-            <h3 class="font-serif-cn text-base font-bold mb-2">空间范围</h3>
-            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q2', s0Answers.q2) }}</div>
-            <p class="text-xs text-gray-500 mt-1" v-html="getOptDesc('q2', s0Answers.q2)"></p>
-          </div>
-          <div class="card p-4 sm:p-5">
-            <h3 class="font-serif-cn text-base font-bold mb-2">时间范围</h3>
-            <div class="font-serif-cn text-2xl font-bold">{{ getOptName('q3', s0Answers.q3) }}</div>
-            <p class="text-xs text-gray-500 mt-1">{{ getOptDesc('q3', s0Answers.q3) }}</p>
-          </div>
-        </div>
-
         <!-- Persona Cards Row: Dominant / Shadow -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <!-- Main Persona -->
@@ -669,25 +650,40 @@
           <p class="text-gray-400 text-xs leading-relaxed mt-3">{{ outsiderNote }} 在 {{ testQuestions.length }} 道题中，你有 {{ outsiderPickCount }} 次选择了外来者的声音。</p>
         </div>
 
-        <!-- World Summary -->
-        <div v-if="!testOnly" class="bg-[#1a1a1a] text-white rounded-lg p-5 sm:p-8">
-          <h3 class="font-serif-cn text-xl font-bold mb-4 red-mark" style="border-left-color: rgba(255,255,255,0.3);">你的世界简述</h3>
-          <p class="leading-relaxed opacity-90 text-sm">
-            这个世界以<b>{{ getOptName('q1', s0Answers.q1_surface) }}</b>为表层结构，
-            以<b>{{ getOptName('q1', s0Answers.q1_inner) }}</b>为深层逻辑。
-            故事发生在一个<b>{{ getOptName('q2', s0Answers.q2) }}</b>级别的空间里，
-            跨越<b>{{ getOptName('q3', s0Answers.q3) }}</b>的时间维度。
-            你的主导力量是<b>{{ sortedPersonas[0].name }}</b>的力量，
-            而<b>{{ shadowPersona.name }}</b>是你尚未觉醒的影子。
-          </p>
-        </div>
       </template>
 
       <div class="mt-10 space-y-4 no-print">
+        <button v-if="testOnly" @click="goPersonas" class="btn-primary w-full">了解原型人格 →</button>
         <button @click="resetGame" class="btn-outline w-full">重新开始</button>
       </div>
     </div>
 
+  </div>
+
+  <!-- ========== ABOUT PAGE ========== -->
+  <div v-if="screen === 'about'" class="min-h-screen">
+    <div class="top-bar px-3 sm:px-6 py-2 sm:py-3 flex justify-between items-center text-sm sticky top-0 z-10">
+      <span class="text-gray-400 text-xs">关于我们</span>
+      <button @click="backFromAbout" class="text-xs text-gray-500 hover:text-[#C8362C] underline bg-transparent border-none cursor-pointer">返回</button>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 py-6 sm:p-6 md:p-10">
+      <h2 class="font-serif-cn text-2xl sm:text-4xl mb-2 red-block">十人小组</h2>
+      <p class="font-serif-cn text-lg sm:text-xl text-gray-700 mb-10 ml-6 leading-relaxed">在共同叙事中，重新理解世界。让未来社会在桌面自然发生。</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="card p-6 text-center">
+          <h3 class="font-serif-cn text-lg font-bold mb-2">找到我们</h3>
+          <p class="text-xs text-gray-500 mb-4">最新资讯、游戏上新、活动报名，来@小红书找我们</p>
+          <img src="asset/十人小组小红书.jpg" alt="小红书二维码" class="mx-auto rounded-lg" style="width:200px;height:200px;object-fit:contain;">
+        </div>
+        <div class="card p-6 text-center">
+          <h3 class="font-serif-cn text-lg font-bold mb-2">留言板</h3>
+          <p class="text-xs text-gray-500 mb-4">投递建议、意见、新的脑洞、人格心声，我们期待更多人的声音。</p>
+          <img src="asset/留言板.jpg" alt="留言板二维码" class="mx-auto rounded-lg" style="width:200px;height:200px;object-fit:contain;">
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -1136,6 +1132,7 @@ createApp({
   data() {
     return {
       screen: 'entry',
+      returnScreen: 'entry',
       step: 0,
       testOnly: false,
       selectedChar: null,
@@ -1418,6 +1415,14 @@ createApp({
       this.testPhase = 'questions';
     },
 
+    goPersonas() {
+      this.step = 3;
+    },
+
+    backFromAbout() {
+      this.screen = this.returnScreen;
+    },
+
     drawRadar() {
       const canvas = this.$refs.radarCanvas;
       if (!canvas) return;
@@ -1491,6 +1496,7 @@ createApp({
 
     resetGame() {
       this.screen = 'entry';
+      this.returnScreen = 'entry';
       this.step = 0;
       this.testOnly = false;
       this.selectedChar = null;
