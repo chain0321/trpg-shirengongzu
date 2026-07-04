@@ -45,7 +45,7 @@
 
     .step-pill {
       padding: 4px 10px; border-radius: 999px;
-      font-size: 0.75rem; color: #999; cursor: pointer;
+      font-size: 0.75rem; color: #999;
     }
     .step-pill.active { background: #1a1a1a; color: white; }
     .step-pill.done { color: #C8362C; }
@@ -117,8 +117,8 @@
       animation: voiceIn 0.4s ease;
     }
     .voice-text {
-      font-family: 'Kaiti SC', 'KaiTi', '楷体', 'Ma Shan Zheng', cursive;
-      font-size: 1.5rem; line-height: 2.1; color: #1a1a1a;
+      font-family: 'Ma Shan Zheng', 'Kaiti SC', 'KaiTi', '楷体', cursive;
+      font-size: 1.5rem; line-height: 2.1; color: #2c2418;
       letter-spacing: 1px;
     }
     .voice-hint { color: rgba(240, 235, 225, 0.5); font-size: 0.8rem; letter-spacing: 3px; }
@@ -264,19 +264,12 @@
 
     <!-- top bar -->
     <div class="top-bar px-3 sm:px-6 py-2 sm:py-3 flex justify-between items-center text-sm sticky top-0 z-10">
-      <!-- 游戏参与者：5 个导航 -->
-      <div v-if="!testOnly" class="flex gap-1 sm:gap-2 flex-nowrap items-center overflow-x-auto">
-        <span :class="['step-pill', step === 0 ? 'active' : step > 0 ? 'done' : '']" @click="goToStep(0)">简介</span>
-        <span :class="['step-pill', step === 2 ? 'active' : step > 2 ? 'done' : '']" @click="goToStep(2)">配置</span>
-        <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']" @click="goToStep(3)">人格</span>
-        <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']" @click="goToStep(4)">测试</span>
-        <span :class="['step-pill', step === 5 ? 'active' : step > 5 ? 'done' : '']" @click="goToStep(5)">报告</span>
-      </div>
-      <!-- 人格测试：3 个导航，按跳转顺序 -->
-      <div v-else class="flex gap-1 sm:gap-2 flex-nowrap items-center overflow-x-auto">
-        <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']" @click="goToStep(4)">测试</span>
-        <span :class="['step-pill', step === 5 ? 'active' : step > 5 ? 'done' : '']" @click="goToStep(5)">报告</span>
-        <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']" @click="goToStep(3)">人格</span>
+      <div class="flex gap-1 sm:gap-2 flex-nowrap items-center overflow-x-auto">
+        <span :class="['step-pill', step === 0 ? 'active' : step > 0 ? 'done' : '']">简介</span>
+        <span :class="['step-pill', step === 2 ? 'active' : step > 2 ? 'done' : '']">配置</span>
+        <span :class="['step-pill', step === 3 ? 'active' : step > 3 ? 'done' : '']">人格</span>
+        <span :class="['step-pill', step === 4 ? 'active' : step > 4 ? 'done' : '']">测试</span>
+        <span :class="['step-pill', step === 5 ? 'active' : step > 5 ? 'done' : '']">报告</span>
       </div>
       <button @click="returnScreen = 'flow'; screen = 'about'" class="text-xs text-gray-500 hover:text-[#C8362C] underline bg-transparent border-none cursor-pointer flex-shrink-0 ml-2">关于我们</button>
     </div>
@@ -594,9 +587,6 @@
                   :class="['q-dot',
                            testAnswers[testScene * 6 + (i-1)] !== null ? 'answered' : '',
                            (i-1) === testQ ? 'current' : '']"></span>
-          </div>
-          <div class="mt-6" v-if="testGlobalIdx > 0">
-            <button @click="prevQuestion" class="btn-outline text-sm py-2">← 上一题</button>
           </div>
         </div>
       </div>
@@ -1422,25 +1412,12 @@ createApp({
       }, 350);
     },
 
-    prevQuestion() {
-      if (this.testQ > 0) {
-        this.testQ--;
-      } else if (this.testScene > 0) {
-        this.testScene--;
-        this.testQ = SCENE_SIZES[this.testScene] - 1;
-      }
-    },
-
     startSceneQuestions() {
       this.testPhase = 'questions';
     },
 
     goPersonas() {
       this.step = 3;
-    },
-
-    goToStep(n) {
-      this.step = n;
     },
 
     backFromAbout() {

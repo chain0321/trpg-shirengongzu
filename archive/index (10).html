@@ -126,31 +126,21 @@
       from { opacity: 0; transform: rotate(-0.8deg) translateY(18px) scale(0.97); }
       to   { opacity: 1; transform: rotate(-0.8deg); }
     }
-    /* 焚烧：火线自下而上一条线吞掉信纸（1.3s） */
-    .voice-card.burning {
+    /* 水墨消散 */
+    .voice-card.dissolving {
       pointer-events: none;
-      animation: burnClip 1.3s ease-in forwards;
+      animation: inkFade 1.6s ease-in forwards;
     }
-    @keyframes burnClip {
-      0%   { clip-path: inset(-30px -30px 0% -30px); }
-      25%  { filter: sepia(0.35) brightness(1.02); }
-      70%  { filter: sepia(0.8) brightness(0.8) contrast(1.05); }
-      100% { clip-path: inset(-30px -30px 102% -30px); filter: sepia(1) brightness(0.55); }
+    @keyframes inkFade {
+      0%   { opacity: 1; filter: blur(0); }
+      20%  { opacity: 0.9; filter: blur(0.5px); }
+      60%  { opacity: 0.4; filter: blur(2px) brightness(0.7); }
+      100% { opacity: 0; filter: blur(4px) brightness(0.3); }
     }
-    .burn-edge {
-      position: absolute; left: -16px; right: -16px; height: 64px; bottom: -3%;
-      pointer-events: none; z-index: 2;
-      background:
-        radial-gradient(ellipse 28% 90% at 12% 100%, rgba(255, 190, 60, 0.95), transparent 70%),
-        radial-gradient(ellipse 36% 100% at 38% 100%, rgba(255, 100, 0, 0.95), transparent 72%),
-        radial-gradient(ellipse 26% 85% at 64% 100%, rgba(255, 170, 30, 0.9), transparent 70%),
-        radial-gradient(ellipse 42% 95% at 90% 100%, rgba(255, 120, 10, 0.9), transparent 72%),
-        linear-gradient(to top, rgba(35, 14, 4, 0.98) 8%, rgba(140, 45, 5, 0.65) 45%, transparent 100%);
-      filter: blur(5px);
-      animation: burnRise 1.3s ease-in forwards, burnFlicker 0.1s linear infinite alternate;
+    .ink-canvas {
+      position: absolute; inset: -20px; z-index: 3;
+      pointer-events: none;
     }
-    @keyframes burnRise { from { bottom: -3%; } to { bottom: 103%; } }
-    @keyframes burnFlicker { from { transform: scaleY(1); opacity: 1; } to { transform: scaleY(1.18) translateY(-3px); opacity: 0.85; } }
 
     .opt-card {
       cursor: pointer; transition: all 200ms;
@@ -541,9 +531,9 @@
 
       <!-- voice (人格心声) overlay -->
       <div v-if="voiceChar" class="voice-overlay" @click.self="closeVoice">
-        <div :class="['voice-card', voiceBurning ? 'burning' : '']" @click="burnVoice">
+        <div :class="['voice-card', voiceBurning ? 'dissolving' : '']" @click="burnVoice">
           <p class="voice-text">{{ voiceText }}</p>
-          <div v-if="voiceBurning" class="burn-edge"></div>
+          <canvas v-if="voiceBurning" ref="inkCanvas" class="ink-canvas"></canvas>
         </div>
         <p class="voice-hint" v-if="!voiceBurning">点 燃 这 封 信</p>
       </div>
@@ -1371,14 +1361,112 @@ createApp({
     burnVoice() {
       if (this.voiceBurning) return;
       this.voiceBurning = true;
+      this.$nextTick(() => this.startInkDissolve());
       setTimeout(() => {
+        this.stopInkDissolve();
         this.voiceBurning = false;
         this.voiceChar = null;
-      }, 1350);
+      }, 1700);
     },
     closeVoice() {
       if (this.voiceBurning) return;
+      this.stopInkDissolve();
       this.voiceChar = null;
+    },
+
+    // ===== 水墨消散粒子系统 =====
+    startInkDissolve() {
+      const canvas = this.$refs.inkCanvas;
+      if (!canvas) return;
+
+      const card = canvas.parentElement;
+      canvas.width = card.offsetWidth + 40;
+      canvas.height = card.offsetHeight + 40;
+
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+      const particles = [];
+      let animId = null;
+      let frame = 0;
+
+      // 墨色调色板：从浓墨到淡墨
+      const inks = [
+        [18, 14, 10],   // 浓墨
+        [30, 24, 20],   // 深灰
+        [45, 38, 33],   // 中灰
+        [60, 52, 47],   // 淡灰
+        [80, 72, 65],   // 浅墨
+      ];
+
+      const spawn = () => {
+        const count = frame < 30 ? 8 : frame < 80 ? 4 : 1;
+        for (let i = 0; i < count; i++) {
+          const ink = inks[Math.floor(Math.random() * inks.length)];
+          particles.push({
+            x: Math.random() * W,
+            y: H * 0.3 + Math.random() * H * 0.5,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: -(Math.random() * 0.6 + 0.2) - Math.random() * 1.5,
+            r: Math.random() * 3 + 1.5,
+            life: 1,
+            decay: 0.003 + Math.random() * 0.012,
+            rr: ink[0], rg: ink[1], rb: ink[2],
+            // 每颗粒子的漂移相位
+            phase: Math.random() * Math.PI * 2,
+            driftAmp: Math.random() * 0.4 + 0.1,
+            driftFreq: 0.02 + Math.random() * 0.04,
+          });
+        }
+      };
+
+      const animate = () => {
+        animId = requestAnimationFrame(animate);
+        frame++;
+        ctx.clearRect(0, 0, W, H);
+
+        if (frame < 90) spawn();
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.life -= p.decay;
+          if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+          // 水墨漂移：水平正弦波 + 上升
+          p.x += p.vx + Math.sin(frame * p.driftFreq + p.phase) * p.driftAmp;
+          p.y += p.vy;
+          // 垂直方向也加一点波动
+          p.vy += (Math.random() - 0.5) * 0.02;
+
+          const alpha = p.life * 0.7;
+
+          // 主粒子（墨点）
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.rr}, ${p.rg}, ${p.rb}, ${alpha})`;
+          ctx.fill();
+
+          // 墨晕：大一圈的半透明光晕，模拟水墨在宣纸上洇开的质感
+          ctx.beginPath();
+          ctx.arc(p.x - 1, p.y - 0.5, p.r * 2.5 * p.life, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.rr}, ${p.rg}, ${p.rb}, ${alpha * 0.15})`;
+          ctx.fill();
+        }
+
+        if (frame > 120 && particles.length === 0) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+      };
+
+      this._inkCancel = () => {
+        if (animId) cancelAnimationFrame(animId);
+        ctx.clearRect(0, 0, W, H);
+      };
+      animate();
+    },
+    stopInkDissolve() {
+      if (this._inkCancel) { this._inkCancel(); this._inkCancel = null; }
     },
 
     getChar(id) { return this.characters.find(c => c.id === id) || {}; },
