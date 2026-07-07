@@ -1,0 +1,27 @@
+{
+  "name": "trpg-static",
+  "version": "1.0.0",
+  "description": "",
+  "main": "assets-base64.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chain0321/trpg-shirengongzu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/chain0321/trpg-shirengongzu/issues"
+  },
+  "homepage": "https://github.com/chain0321/trpg-shirengongzu#readme",
+  "dependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
