@@ -84,13 +84,16 @@
     };
   }
 
+  // 初始化时缓存 visitor_id，避免页面卸载时读 localStorage 失败
+  var _cachedVisitorId = getVisitorId();
+
   // ---- 发送事件 ----
   function send(payload) {
     if (!WORKER_URL || WORKER_URL.indexOf('__') === 0) return;
     try {
       var data = JSON.parse(JSON.stringify(payload));
       data.sessionId = getSessionId();
-      data.visitorId = getVisitorId();
+      data.visitorId = _cachedVisitorId;
       data.project = PROJECT_ID || 'daydream';
       // 使用 sendBeacon 或 fetch，不阻塞页面
       var body = JSON.stringify(data);
