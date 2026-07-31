@@ -1519,6 +1519,16 @@ createApp({
       });
     },
 
+    trackPageView() {
+      if (!window._daydreamAnalytics) return;
+      var path = '/' + this.screen;
+      if (this.screen === 'flow') {
+        var stepNames = { 0: 'intro', 2: 'config', 3: 'personality', 4: 'test', 5: 'report' };
+        path += '/' + (stepNames[this.step] || 'step-' + this.step);
+      }
+      window._daydreamAnalytics.pageview(path);
+    },
+
     resetGame() {
       this.screen = 'entry';
       this.returnScreen = 'entry';
@@ -1534,10 +1544,19 @@ createApp({
       this.testCompleted = false;
     }
   },
+  watch: {
+    screen(val) {
+      this.trackPageView();
+    },
+    step(val) {
+      this.trackPageView();
+    }
+  },
   mounted() {
     this.loadVoices();
+    // 初始页面追踪
+    this.$nextTick(() => { this.trackPageView(); });
   }
-}).mount('#app');
 </script>
 </body>
 </html>
