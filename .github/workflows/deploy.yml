@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inject Analytics Config
+        run: |
+          if [ -z "${{ secrets.ANALYTICS_WORKER_URL }}" ]; then
+            echo "::warning::ANALYTICS_WORKER_URL secret is not set. Analytics disabled."
+          else
+            sed -i "s|__ANALYTICS_WORKER_URL__|${{ secrets.ANALYTICS_WORKER_URL }}|g" analytics.js
+            echo "Analytics worker URL injected successfully."
+          fi
+          if [ -z "${{ secrets.ANALYTICS_PROJECT_ID }}" ]; then
+            echo "::warning::ANALYTICS_PROJECT_ID secret not set. Using default."
+          else
+            sed -i "s|__ANALYTICS_PROJECT_ID__|${{ secrets.ANALYTICS_PROJECT_ID }}|g" analytics.js
+            echo "Analytics project ID injected."
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
