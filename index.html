@@ -1520,12 +1520,13 @@ createApp({
     },
 
     trackPageView() {
-      if (!window._daydreamAnalytics) return;
+      if (!window._daydreamAnalytics) { console.warn('[analytics] _daydreamAnalytics not ready'); return; }
       var path = '/' + this.screen;
       if (this.screen === 'flow') {
         var stepNames = { 0: 'intro', 2: 'config', 3: 'personality', 4: 'test', 5: 'report' };
         path += '/' + (stepNames[this.step] || 'step-' + this.step);
       }
+      console.log('[analytics] trackPageView:', path, '| screen:', this.screen, '| step:', this.step);
       window._daydreamAnalytics.pageview(path);
     },
 
