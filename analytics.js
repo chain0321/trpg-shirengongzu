@@ -95,15 +95,12 @@
       data.sessionId = getSessionId();
       data.visitorId = _cachedVisitorId;
       data.project = PROJECT_ID || 'daydream';
-      // 使用 sendBeacon 或 fetch，不阻塞页面
+      // fetch 代替 sendBeacon，以便捕获错误详情
       var body = JSON.stringify(data);
       console.log('[analytics.js] send: project=' + data.project + ' path=' + data.pagePath + ' type=' + data.eventType + ' sid=' + data.sessionId.slice(0,8) + '...');
-      if (navigator.sendBeacon) {
-        var ok = navigator.sendBeacon(WORKER_URL + '/track', body);
-        if (!ok) console.warn('[analytics.js] sendBeacon returned false');
-      } else {
-        fetch(WORKER_URL + '/track', { method: 'POST', body: body, keepalive: true }).catch(function (e) { console.error('[analytics.js] fetch error:', e); });
-      }
+      fetch(WORKER_URL + '/track', { method: 'POST', body: body, keepalive: true })
+        .then(function(r) { if (!r.ok) console.warn('[analytics.js] response ' + r.status); })
+        .catch(function (e) { console.error('[analytics.js] fetch error:', e); });
     } catch (ignore) { /* 分析失败不影响主功能 */ }
   }
 
