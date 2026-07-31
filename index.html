@@ -1525,6 +1525,11 @@ createApp({
       if (this.screen === 'flow') {
         var stepNames = { 0: 'intro', 2: 'config', 3: 'personality', 4: 'test', 5: 'report' };
         path += '/' + (stepNames[this.step] || 'step-' + this.step);
+        // 测试页内部追踪：场景和阶段
+        if (this.step === 4) {
+          path += '/scene-' + this.testScene;
+          if (this.testPhase) path += '/' + this.testPhase;
+        }
       }
       console.log('[analytics] trackPageView:', path, '| screen:', this.screen, '| step:', this.step);
       window._daydreamAnalytics.pageview(path);
@@ -1551,6 +1556,12 @@ createApp({
     },
     step(val) {
       this.trackPageView();
+    },
+    testScene(val) {
+      if (this.screen === 'flow' && this.step === 4) this.trackPageView();
+    },
+    testPhase(val) {
+      if (this.screen === 'flow' && this.step === 4) this.trackPageView();
     }
   },
   mounted() {
