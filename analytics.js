@@ -89,7 +89,7 @@
 
   // ---- 发送事件 ----
   function send(payload) {
-    if (!WORKER_URL || WORKER_URL.indexOf('__') === 0) return;
+    if (!WORKER_URL || WORKER_URL.indexOf('__') === 0) { console.warn('[analytics.js] WORKER_URL not set, skipping send'); return; }
     try {
       var data = JSON.parse(JSON.stringify(payload));
       data.sessionId = getSessionId();
@@ -97,10 +97,12 @@
       data.project = PROJECT_ID || 'daydream';
       // 使用 sendBeacon 或 fetch，不阻塞页面
       var body = JSON.stringify(data);
+      console.log('[analytics.js] send: project=' + data.project + ' path=' + data.pagePath + ' type=' + data.eventType + ' sid=' + data.sessionId.slice(0,8) + '...');
       if (navigator.sendBeacon) {
-        navigator.sendBeacon(WORKER_URL + '/track', body);
+        var ok = navigator.sendBeacon(WORKER_URL + '/track', body);
+        if (!ok) console.warn('[analytics.js] sendBeacon returned false');
       } else {
-        fetch(WORKER_URL + '/track', { method: 'POST', body: body, keepalive: true }).catch(function () {});
+        fetch(WORKER_URL + '/track', { method: 'POST', body: body, keepalive: true }).catch(function (e) { console.error('[analytics.js] fetch error:', e); });
       }
     } catch (ignore) { /* 分析失败不影响主功能 */ }
   }
@@ -109,6 +111,7 @@
   var api = {
     /** 页面访问（可传入自定义路径，用于 SPA 内页追踪） */
     pageview: function (customPath) {
+      console.log('[analytics.js] pageview called, customPath=' + (customPath || '(auto)'));
       var info = deviceInfo();
       send({
         eventType: '页面访问',
